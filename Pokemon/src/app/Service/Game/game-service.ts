@@ -1,5 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { Pokemon } from '../../Model/Pokemon';
+import { Pokemon, ALL_STATS } from '../../Model/Pokemon';
 import { PokemonService } from '../Pokemon/pokemon-service';
 
 @Injectable({
@@ -12,7 +12,12 @@ export class GameService {
   readonly opponent = signal<Pokemon | null>(null);
   readonly victories = signal<number>(0);
   readonly currentTier = signal<1 | 2 | 3>(1);
-  readonly selectedStat = signal<string>('');
+  readonly selectedStatId = signal<string>('');
+
+  readonly selectedStatName = computed(() => {
+    const id = this.selectedStatId();
+    return ALL_STATS.find(s => s.id === id)?.name || '';
+  });
 
   readonly isGameOver = computed(() => this.team().length > 0 && this.team().every((p) => p.isFainted));
   readonly canEvolve = computed(() => this.victories() >= 10 && this.currentTier() < 3);
@@ -38,22 +43,18 @@ export class GameService {
   }
 
   generateRandomStat() {
-    const rival = this.opponent();
-    if (rival && rival.stats.length > 0) {
-      const randomIndex = Math.floor(Math.random() * rival.stats.length);
-      this.selectedStat.set(rival.stats[randomIndex].name);
-    }
+    const randomIndex = Math.floor(Math.random() * ALL_STATS.length);
+    this.selectedStatId.set(ALL_STATS[randomIndex].id);
   }
 
- 
   resolveBattle(playerPokemon: Pokemon): boolean {
     const rival = this.opponent();
-    const statName = this.selectedStat();
+    const statId = this.selectedStatId();
 
-    if (!rival || !statName) return false;
+    if (!rival || !statId) return false;
 
-    const playerStatValue = playerPokemon.stats.find(s => s.name === statName)?.value || 0;
-    const rivalStatValue = rival.stats.find(s => s.name === statName)?.value || 0;
+    const playerStatValue = playerPokemon.stats.find(s => s.name === statId)?.value || 0;
+    const rivalStatValue = rival.stats.find(s => s.name === statId)?.value || 0;
 
     if (playerStatValue >= rivalStatValue) {
       this.winBattle();
