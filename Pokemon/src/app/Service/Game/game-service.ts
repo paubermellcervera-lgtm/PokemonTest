@@ -27,6 +27,9 @@ export class GameService {
   readonly isEvolving = signal<boolean>(false);
   readonly evolvedTeamPreview = signal<Pokemon[]>([]);
 
+  // Configuración de audio
+  readonly volume = signal<number>(0.1); // Bajado al 10% para que sea suave
+
   readonly selectedStatName = computed(() => {
     const id = this.selectedStatId();
     return ALL_STATS.find(s => s.id === id)?.name || '';
@@ -95,8 +98,8 @@ export class GameService {
     const rival = await this.pokemonService.getRandomPokemonByTier(this.currentTier());
     this.opponent.set(rival);
     this.generateRandomStat();
-    
-    // Reproducir el grito del pokemon rival
+
+    // Reproducir grito
     if (rival.cry) {
       this.playCry(rival.cry);
     }
@@ -104,8 +107,8 @@ export class GameService {
 
   playCry(url: string) {
     const audio = new Audio(url);
-    audio.volume = 0.5; // Un volumen moderado
-    audio.play().catch(e => console.warn('Error al reproducir sonido (posible interacción de usuario necesaria):', e));
+    audio.volume = this.volume();
+    audio.play().catch(e => console.warn('Error audio:', e));
   }
 
   generateRandomStat() {

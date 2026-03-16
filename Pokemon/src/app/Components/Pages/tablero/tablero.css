@@ -5,8 +5,14 @@
   gap: 1.5rem;
   padding: 1.5rem;
   min-height: 100vh;
-  background-color: #f5f5f5;
+  width: 100%;
+  background-image: url('/img/Fondo Combate.webp');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   font-family: Arial, sans-serif;
+  overflow-x: hidden;
 }
 
 .header {
@@ -31,7 +37,7 @@
   align-items: center;
   width: 100%;
   gap: 1rem;
-  margin: 1rem 0;
+  margin: 1.5rem 0;
   position: relative;
   z-index: 1;
 }
@@ -39,7 +45,7 @@
 .battle-divider {
   flex-grow: 1;
   height: 3px;
-  background: linear-gradient(90deg, transparent, #ccc, transparent);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
 }
 
 .battle-stats-center {
@@ -47,22 +53,58 @@
   flex-direction: column;
   align-items: center;
   background: white;
-  padding: 1rem 2rem;
-  border-radius: 50px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-  border: 2px solid #3498db;
+  padding: 0.5rem 2rem 1rem 2rem;
+  border-radius: 20px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+  border: 3px solid #3498db;
+  min-width: 250px;
+}
+
+.vs-container {
+  margin-top: -15px;
+  margin-bottom: 10px;
+  z-index: 10;
+}
+
+.vs-text {
+  background: #e74c3c;
+  color: white;
+  font-weight: 900;
+  padding: 4px 15px;
+  border-radius: 10px;
+  font-size: 1rem;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  border: 2px solid white;
+}
+
+.stat-focus {
+  width: 100%;
+  text-align: center;
+}
+
+.stat-badge {
+  color: #2c3e50;
+  font-size: 1.6rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  display: block;
+}
+
+.evolution-progress {
+  margin-top: 8px;
+  font-size: 0.9rem;
+  color: #7f8c8d;
+  border-top: 1px solid #eee;
+  padding-top: 5px;
+  width: 100%;
 }
 
 .evo-text {
   color: #2980b9;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   margin: 0;
-  animation: pulse 1s infinite alternate;
-}
-
-@keyframes pulse {
-  from { transform: scale(1); opacity: 0.8; }
-  to { transform: scale(1.05); opacity: 1; }
+  text-align: center;
 }
 
 /* ANIMACIÓN DE EVOLUCIÓN */

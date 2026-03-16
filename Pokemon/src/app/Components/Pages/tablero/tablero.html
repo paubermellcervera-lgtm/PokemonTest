@@ -41,8 +41,10 @@
           @if (gameService.isEvolving()) {
             <h2 class="evo-text">¡TU EQUIPO ESTÁ EVOLUCIONANDO!</h2>
           } @else {
+            <div class="vs-container">
+              <span class="vs-text">VS</span>
+            </div>
             <div class="stat-focus">
-              <span class="stat-label">VS</span>
               <span class="stat-badge">{{ nombreEstadistica }}</span>
             </div>
             <div class="evolution-progress">Evolución: <strong>{{ gameService.victories() }} / 10</strong></div>
