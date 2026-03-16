@@ -1,1 +1,43 @@
-<p>carta-pokemon works!</p>
+<div class="card-container" [class.fainted]="pokemon()?.isFainted" [class.loading]="isLoading()">
+  
+  @if (isLoading()) {
+    <div class="spinner-overlay">
+      <div class="spinner"></div>
+    </div>
+  }
+
+  @if (pokemon(); as p) {
+    <div class="pokemon-image">
+      <img [src]="p.image" [alt]="p.name">
+    </div>
+    
+    <div class="pokemon-info">
+      <h3>{{ p.name | titlecase }}</h3>
+      <p class="tier-badge">Tier {{ p.tier }}</p>
+
+      <ul class="stats-list">
+        @if (hideStats()) {
+          <!-- Si están ocultas (Rival), mostramos interrogantes -->
+          @for (stat of p.stats; track stat.name) {
+            <li>
+              <span class="stat-name">{{ stat.name }}:</span>
+              <span class="stat-value">???</span>
+            </li>
+          }
+        } @else {
+          <!-- Si son visibles (Jugador), mostramos los valores filtrados -->
+          @for (stat of statsFiltradas; track stat.name) {
+            <li>
+              <span class="stat-name">{{ stat.name }}:</span>
+              <span class="stat-value">{{ stat.value }}</span>
+            </li>
+          }
+        }
+      </ul>
+    </div>
+  } @else if (!isLoading()) {
+    <div class="empty-slot">
+      <span>?</span>
+    </div>
+  }
+</div>

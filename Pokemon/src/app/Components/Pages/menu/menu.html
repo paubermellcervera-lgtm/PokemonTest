@@ -1,1 +1,27 @@
-<p>menu works!</p>
+<div class="menu-container">
+  <!-- Puntuación máxima arriba a la izquierda -->
+  <div class="high-score">
+    High Score: {{ highScore() }}
+  </div>
+
+  <h1>Pokémon Battle Game</h1>
+
+  <div class="options">
+    <button (click)="iniciarJuego()">Iniciar</button>
+    <button (click)="toggleHowToPlay()">¿Cómo jugar?</button>
+  </div>
+
+  @if (showHowToPlay()) {
+    <div class="modal">
+      <div class="modal-content">
+        <h2>¿Cómo jugar?</h2>
+        <p>1. Empiezas con 3 Pokémon de Tier 1.</p>
+        <p>2. En cada batalla, se elige una estadística al azar (Ataque, Defensa, etc.).</p>
+        <p>3. El Pokémon con el valor más alto en esa estadística gana.</p>
+        <p>4. Gana 10 batallas para que tu equipo evolucione.</p>
+        <p>5. Si todos tus Pokémon se debilitan, ¡el juego termina!</p>
+        <button (click)="toggleHowToPlay()">Cerrar</button>
+      </div>
+    </div>
+  }
+</div>

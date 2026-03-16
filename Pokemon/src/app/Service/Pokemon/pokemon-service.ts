@@ -20,7 +20,7 @@ export class PokemonService {
     return {
       id: data.id,
       name: data.name,
-      image: data.sprites.other['official-artwork'].front_default,
+      image: data.sprites.front_default, // Sprite clásico
       tier: tier,
       isFainted: false,
       evolutionChainId: chainId,
@@ -37,7 +37,7 @@ export class PokemonService {
     let family = { t1: 0, t2: 0, t3: 0 };
 
     while (!found) {
-      const randomChainId = Math.floor(Math.random() * 1349) + 1;
+      const randomChainId = Math.floor(Math.random() * 541) + 1;
       try {
         const chainData: any = await firstValueFrom(
           this.http.get(`${this.baseUrl}/evolution-chain/${randomChainId}/`)

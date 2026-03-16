@@ -1,39 +1,89 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Pokemon, ALL_STATS } from '../../Model/Pokemon';
 import { PokemonService } from '../Pokemon/pokemon-service';
+import { StorageService } from '../storage-service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class GameService {
   private pokemonService = inject(PokemonService);
+  private storageService = inject(StorageService);
 
   readonly team = signal<Pokemon[]>([]);
   readonly opponent = signal<Pokemon | null>(null);
   readonly victories = signal<number>(0);
+  readonly totalVictories = signal<number>(0);
   readonly currentTier = signal<1 | 2 | 3>(1);
   readonly selectedStatId = signal<string>('');
+  
+  readonly rerolls = signal<number[]>([3, 3, 3]);
+  readonly isSelectionPhase = signal<boolean>(true);
 
   readonly selectedStatName = computed(() => {
     const id = this.selectedStatId();
     return ALL_STATS.find(s => s.id === id)?.name || '';
   });
 
-  readonly isGameOver = computed(() => this.team().length > 0 && this.team().every((p) => p.isFainted));
+  readonly isGameOver = computed(() => 
+    !this.isSelectionPhase() && 
+    this.team().length > 0 && 
+    this.team().every((p) => p.isFainted)
+  );
+
   readonly canEvolve = computed(() => this.victories() >= 10 && this.currentTier() < 3);
 
   async initGame() {
     this.victories.set(0);
+    this.totalVictories.set(0);
     this.currentTier.set(1);
-    
-    const newTeam = await Promise.all([
-      this.pokemonService.getRandomPokemonByTier(1),
-      this.pokemonService.getRandomPokemonByTier(1),
-      this.pokemonService.getRandomPokemonByTier(1),
-    ]);
-    this.team.set(newTeam);
-    
-    await this.spawnOpponent();
+    this.team.set([]);
+    this.rerolls.set([3, 3, 3]);
+    this.isSelectionPhase.set(true);
+    this.opponent.set(null);
+  }
+
+  readonly loadingSlots = signal<boolean[]>([false, false, false]);
+
+  async generatePokemonForSlot(index: number) {
+    const currentRerolls = this.rerolls();
+    if (currentRerolls[index] > 0) {
+      this.loadingSlots.update(ls => {
+        const newLs = [...ls];
+        newLs[index] = true;
+        return newLs;
+      });
+
+      try {
+        const newPokemon = await this.pokemonService.getRandomPokemonByTier(this.currentTier());
+        
+        this.team.update(currentTeam => {
+          const newTeam = [...currentTeam];
+          while (newTeam.length <= index) {
+            newTeam.push(null as any);
+          }
+          newTeam[index] = newPokemon;
+          return newTeam.filter(p => p !== null);
+        });
+
+        const newRerolls = [...currentRerolls];
+        newRerolls[index]--;
+        this.rerolls.set(newRerolls);
+      } finally {
+        this.loadingSlots.update(ls => {
+          const newLs = [...ls];
+          newLs[index] = false;
+          return newLs;
+        });
+      }
+    }
+  }
+
+  async confirmTeam() {
+    if (this.team().length === 3) {
+      this.isSelectionPhase.set(false);
+      await this.spawnOpponent();
+    }
   }
 
   async spawnOpponent() {
@@ -66,8 +116,12 @@ export class GameService {
     }
   }
 
-  async winBattle(capturedPokemon?: boolean) {
+  async winBattle() {
     this.victories.update(v => v + 1);
+    this.totalVictories.update(v => v + 1);
+    
+    // Guardamos el high score basado en el total de victorias de esta partida
+    this.storageService.saveHighScore(this.totalVictories());
     
     if (this.canEvolve()) {
       await this.evolveTeam();

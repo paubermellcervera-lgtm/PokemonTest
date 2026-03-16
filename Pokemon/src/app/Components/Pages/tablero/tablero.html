@@ -1,1 +1,103 @@
-<p>tablero works!</p>
+<div class="tablero-container">
+  
+  <div class="header">
+    <div class="header-nav">
+      <button routerLink="/menu" class="btn-back">⬅ Volver al Menú</button>
+    </div>
+    
+    <div class="top-info-bar">
+      <!-- Izquierda: Nivel de Tier -->
+      <div class="tier-info">
+        Tier actual: <strong>{{ gameService.currentTier() }}</strong>
+      </div>
+
+      <!-- Derecha: Victorias Totales -->
+      <div class="total-victories-badge">
+        Victorias Totales: <strong>{{ gameService.totalVictories() }}</strong>
+      </div>
+    </div>
+
+    @if (esFaseSeleccion) {
+      <div class="selection-header">
+        <h2>Selecciona tu equipo</h2>
+        <p>Prepara tus 3 Pokémon (3 Rerolls por slot)</p>
+      </div>
+    }
+  </div>
+
+  <div class="battle-area">
+    <!-- RIVAL ARRIBA -->
+    <div class="opponent-side">
+      <h3>Oponente</h3>
+      @if (pokemonRival) {
+        <app-carta-pokemon 
+          [pokemon]="pokemonRival" 
+          [hideStats]="true"
+        ></app-carta-pokemon>
+      }
+    </div>
+
+    <!-- CENTRO: ESTADÍSTICA Y PROGRESO -->
+    <div class="central-battle-zone">
+      <div class="battle-divider"></div>
+      
+      @if (!esFaseSeleccion) {
+        <div class="battle-stats-center">
+          <div class="stat-focus">
+            <span class="stat-label">VS</span>
+            <span class="stat-badge">{{ nombreEstadistica }}</span>
+          </div>
+          <div class="evolution-progress">
+            Evolución: <strong>{{ gameService.victories() }} / 10</strong>
+          </div>
+        </div>
+      } @else {
+        <div class="vs-label">PREPARACIÓN</div>
+      }
+
+      <div class="battle-divider"></div>
+    </div>
+
+    <!-- JUGADOR ABAJO -->
+    <div class="player-side">
+      <h3>Tu Equipo</h3>
+      <div class="team-slots">
+        @for (slot of [0, 1, 2]; track slot) {
+          <div class="slot-container">
+            @if (esFaseSeleccion) {
+              <div class="reroll-controls">
+                <button (click)="reroll(slot)" [disabled]="rerolls[slot] === 0" class="btn-reroll">
+                  Reroll ({{ rerolls[slot] }})
+                </button>
+              </div>
+            }
+
+            <app-carta-pokemon 
+              [pokemon]="miEquipo[slot] || null"
+              [isLoading]="gameService.loadingSlots()[slot]"
+              [showOnlyStatId]="esFaseSeleccion ? null : estadisticaSeleccionada"
+              (click)="seleccionarParaBatalla(slot)"
+              [class.selectable]="!esFaseSeleccion && miEquipo[slot] && !miEquipo[slot].isFainted"
+            ></app-carta-pokemon>
+          </div>
+        }
+      </div>
+
+      @if (esFaseSeleccion) {
+        <div class="actions">
+          <button (click)="confirmarEquipo()" [disabled]="miEquipo.length < 3" class="btn-confirm">
+            ¡CONFIRMAR EQUIPO E INICIAR!
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+
+  @if (gameService.isGameOver()) {
+    <div class="game-over-modal">
+      <h2>¡DERROTA!</h2>
+      <p>Has conseguido {{ gameService.totalVictories() }} victorias en total.</p>
+      <button routerLink="/menu" class="btn-menu">Volver al Menú Principal</button>
+    </div>
+  }
+</div>
