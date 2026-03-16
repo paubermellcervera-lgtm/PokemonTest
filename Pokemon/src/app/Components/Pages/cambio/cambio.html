@@ -1,1 +1,51 @@
-<p>cambio works!</p>
+<div class="cambio-container">
+  
+  <div class="header">
+    <h1>¡Has ganado el combate!</h1>
+    <p>¿Quieres capturar a {{ pokemonDerrotado?.name | titlecase }} para tu equipo?</p>
+  </div>
+
+  <div class="exchange-area">
+    <!-- Pokémon Derrotado (El premio) -->
+    <div class="prize-section">
+      <h3>Pokémon para capturar</h3>
+      @if (pokemonDerrotado; as p) {
+        <app-carta-pokemon [pokemon]="p"></app-carta-pokemon>
+      }
+    </div>
+
+    <div class="divider">
+      <span class="vs">POR</span>
+    </div>
+
+    <!-- Tu equipo (Para elegir el reemplazo) -->
+    <div class="team-section">
+      <h3>Tu equipo actual</h3>
+      <p>(Elige a quién quieres sustituir - Los Pokémon debilitados no pueden ser cambiados)</p>
+      
+      <div class="team-grid">
+        @for (p of miEquipo; track p.id; let i = $index) {
+          <div class="slot-container" 
+               [class.disabled]="p.isFainted"
+               (click)="!p.isFainted && reemplazar(i)">
+            
+            <app-carta-pokemon [pokemon]="p"></app-carta-pokemon>
+            
+            @if (!p.isFainted) {
+              <div class="replace-overlay">Sustituir</div>
+            } @else {
+              <div class="fainted-overlay">DEBILITADO</div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button (click)="noCambiar()" class="btn-cancel">
+      Cancelar Intercambio
+    </button>
+  </div>
+
+</div>

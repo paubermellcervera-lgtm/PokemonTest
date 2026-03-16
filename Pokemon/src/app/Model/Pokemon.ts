@@ -16,6 +16,7 @@ export interface Pokemon {
   id: number;
   name: string;
   image: string;
+  cry?: string;
   tier: 1 | 2 | 3;
   stats: Stat[];
   isFainted: boolean;

@@ -6,15 +6,8 @@
     </div>
     
     <div class="top-info-bar">
-      <!-- Izquierda: Nivel de Tier -->
-      <div class="tier-info">
-        Tier actual: <strong>{{ gameService.currentTier() }}</strong>
-      </div>
-
-      <!-- Derecha: Victorias Totales -->
-      <div class="total-victories-badge">
-        Victorias Totales: <strong>{{ gameService.totalVictories() }}</strong>
-      </div>
+      <div class="tier-info">Tier actual: <strong>{{ gameService.currentTier() }}</strong></div>
+      <div class="total-victories-badge">Victorias Totales: <strong>{{ gameService.totalVictories() }}</strong></div>
     </div>
 
     @if (esFaseSeleccion) {
@@ -25,31 +18,35 @@
     }
   </div>
 
-  <div class="battle-area">
+  <div class="battle-area" [class.animating]="animatingIndex() !== null">
     <!-- RIVAL ARRIBA -->
-    <div class="opponent-side">
+    <div class="opponent-side" [class.combat-focus]="animatingIndex() !== null">
       <h3>Oponente</h3>
       @if (pokemonRival) {
         <app-carta-pokemon 
           [pokemon]="pokemonRival" 
           [hideStats]="true"
+          [revealed]="revealRivalStat()"
+          [showOnlyStatId]="estadisticaSeleccionada"
         ></app-carta-pokemon>
       }
     </div>
 
-    <!-- CENTRO: ESTADÍSTICA Y PROGRESO -->
+    <!-- CENTRO: VS O EVO -->
     <div class="central-battle-zone">
       <div class="battle-divider"></div>
       
       @if (!esFaseSeleccion) {
         <div class="battle-stats-center">
-          <div class="stat-focus">
-            <span class="stat-label">VS</span>
-            <span class="stat-badge">{{ nombreEstadistica }}</span>
-          </div>
-          <div class="evolution-progress">
-            Evolución: <strong>{{ gameService.victories() }} / 10</strong>
-          </div>
+          @if (gameService.isEvolving()) {
+            <h2 class="evo-text">¡TU EQUIPO ESTÁ EVOLUCIONANDO!</h2>
+          } @else {
+            <div class="stat-focus">
+              <span class="stat-label">VS</span>
+              <span class="stat-badge">{{ nombreEstadistica }}</span>
+            </div>
+            <div class="evolution-progress">Evolución: <strong>{{ gameService.victories() }} / 10</strong></div>
+          }
         </div>
       } @else {
         <div class="vs-label">PREPARACIÓN</div>
@@ -63,7 +60,7 @@
       <h3>Tu Equipo</h3>
       <div class="team-slots">
         @for (slot of [0, 1, 2]; track slot) {
-          <div class="slot-container">
+          <div class="slot-container" [class.combat-focus]="animatingIndex() === slot">
             @if (esFaseSeleccion) {
               <div class="reroll-controls">
                 <button (click)="reroll(slot)" [disabled]="rerolls[slot] === 0" class="btn-reroll">
@@ -72,13 +69,28 @@
               </div>
             }
 
-            <app-carta-pokemon 
-              [pokemon]="miEquipo[slot] || null"
-              [isLoading]="gameService.loadingSlots()[slot]"
-              [showOnlyStatId]="esFaseSeleccion ? null : estadisticaSeleccionada"
-              (click)="seleccionarParaBatalla(slot)"
-              [class.selectable]="!esFaseSeleccion && miEquipo[slot] && !miEquipo[slot].isFainted"
-            ></app-carta-pokemon>
+            <!-- DURANTE LA EVOLUCIÓN: Mostramos la animación -->
+            @if (gameService.isEvolving()) {
+              <div class="evolution-sprite-container" [class.white-filter]="isEvolutionWhite()">
+                @if (showEvolvedSprite()) {
+                  <img [src]="equipoEvolucionado[slot].image" class="evo-img">
+                } @else {
+                  <img [src]="miEquipo[slot].image" class="evo-img">
+                }
+                @if (evolutionFinished()) {
+                  <div class="glow-effect"></div>
+                }
+              </div>
+            } @else {
+              <!-- COMPONENTE NORMAL -->
+              <app-carta-pokemon 
+                [pokemon]="miEquipo[slot] || null"
+                [isLoading]="gameService.loadingSlots()[slot]"
+                [showOnlyStatId]="esFaseSeleccion ? null : estadisticaSeleccionada"
+                (click)="seleccionarParaBatalla(slot)"
+                [class.selectable]="!esFaseSeleccion && miEquipo[slot] && !miEquipo[slot].isFainted"
+              ></app-carta-pokemon>
+            }
           </div>
         }
       </div>

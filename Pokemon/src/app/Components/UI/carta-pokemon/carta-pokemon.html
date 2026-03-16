@@ -1,4 +1,4 @@
-<div class="card-container" [class.fainted]="pokemon()?.isFainted" [class.loading]="isLoading()">
+<div class="card-container" [class.fainted]="pokemon()?.isFainted" [class.loading]="isLoading()" [class.revealing]="revealed()">
   
   @if (isLoading()) {
     <div class="spinner-overlay">
@@ -16,20 +16,22 @@
       <p class="tier-badge">Tier {{ p.tier }}</p>
 
       <ul class="stats-list">
-        @if (hideStats()) {
-          <!-- Si están ocultas (Rival), mostramos interrogantes -->
-          @for (stat of p.stats; track stat.name) {
+        @if (hideStats() && !revealed()) {
+          <!-- El rival ahora solo muestra la stat de la pelea con ??? -->
+          @for (stat of statsFiltradas; track stat.name) {
             <li>
               <span class="stat-name">{{ stat.name }}:</span>
               <span class="stat-value">???</span>
             </li>
           }
         } @else {
-          <!-- Si son visibles (Jugador), mostramos los valores filtrados -->
+          <!-- Jugador o Rival revelado -->
           @for (stat of statsFiltradas; track stat.name) {
             <li>
               <span class="stat-name">{{ stat.name }}:</span>
-              <span class="stat-value">{{ stat.value }}</span>
+              <span class="stat-value">
+                {{ revealed() ? (displayValues()[stat.name] || 0) : stat.value }}
+              </span>
             </li>
           }
         }

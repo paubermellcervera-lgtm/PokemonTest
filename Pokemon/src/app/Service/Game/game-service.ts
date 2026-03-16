@@ -1,4 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { Pokemon, ALL_STATS } from '../../Model/Pokemon';
 import { PokemonService } from '../Pokemon/pokemon-service';
 import { StorageService } from '../storage-service';
@@ -9,9 +10,11 @@ import { StorageService } from '../storage-service';
 export class GameService {
   private pokemonService = inject(PokemonService);
   private storageService = inject(StorageService);
+  private router = inject(Router);
 
   readonly team = signal<Pokemon[]>([]);
   readonly opponent = signal<Pokemon | null>(null);
+  readonly defeatedOpponent = signal<Pokemon | null>(null);
   readonly victories = signal<number>(0);
   readonly totalVictories = signal<number>(0);
   readonly currentTier = signal<1 | 2 | 3>(1);
@@ -19,6 +22,10 @@ export class GameService {
   
   readonly rerolls = signal<number[]>([3, 3, 3]);
   readonly isSelectionPhase = signal<boolean>(true);
+
+  // Estados para la animación de evolución
+  readonly isEvolving = signal<boolean>(false);
+  readonly evolvedTeamPreview = signal<Pokemon[]>([]);
 
   readonly selectedStatName = computed(() => {
     const id = this.selectedStatId();
@@ -40,7 +47,10 @@ export class GameService {
     this.team.set([]);
     this.rerolls.set([3, 3, 3]);
     this.isSelectionPhase.set(true);
+    this.isEvolving.set(false);
     this.opponent.set(null);
+    this.defeatedOpponent.set(null);
+    this.evolvedTeamPreview.set([]);
   }
 
   readonly loadingSlots = signal<boolean[]>([false, false, false]);
@@ -53,19 +63,14 @@ export class GameService {
         newLs[index] = true;
         return newLs;
       });
-
       try {
         const newPokemon = await this.pokemonService.getRandomPokemonByTier(this.currentTier());
-        
         this.team.update(currentTeam => {
           const newTeam = [...currentTeam];
-          while (newTeam.length <= index) {
-            newTeam.push(null as any);
-          }
+          while (newTeam.length <= index) newTeam.push(null as any);
           newTeam[index] = newPokemon;
           return newTeam.filter(p => p !== null);
         });
-
         const newRerolls = [...currentRerolls];
         newRerolls[index]--;
         this.rerolls.set(newRerolls);
@@ -90,6 +95,17 @@ export class GameService {
     const rival = await this.pokemonService.getRandomPokemonByTier(this.currentTier());
     this.opponent.set(rival);
     this.generateRandomStat();
+    
+    // Reproducir el grito del pokemon rival
+    if (rival.cry) {
+      this.playCry(rival.cry);
+    }
+  }
+
+  playCry(url: string) {
+    const audio = new Audio(url);
+    audio.volume = 0.5; // Un volumen moderado
+    audio.play().catch(e => console.warn('Error al reproducir sonido (posible interacción de usuario necesaria):', e));
   }
 
   generateRandomStat() {
@@ -97,21 +113,20 @@ export class GameService {
     this.selectedStatId.set(ALL_STATS[randomIndex].id);
   }
 
-  resolveBattle(playerPokemon: Pokemon): boolean {
+  async resolveBattle(playerPokemon: Pokemon): Promise<boolean> {
     const rival = this.opponent();
     const statId = this.selectedStatId();
-
     if (!rival || !statId) return false;
 
     const playerStatValue = playerPokemon.stats.find(s => s.name === statId)?.value || 0;
     const rivalStatValue = rival.stats.find(s => s.name === statId)?.value || 0;
 
     if (playerStatValue >= rivalStatValue) {
-      this.winBattle();
+      await this.winBattle();
       return true;
     } else {
       this.updatePokemonStatus(playerPokemon.id, true);
-      this.generateRandomStat();
+      await this.spawnOpponent();
       return false;
     }
   }
@@ -119,18 +134,34 @@ export class GameService {
   async winBattle() {
     this.victories.update(v => v + 1);
     this.totalVictories.update(v => v + 1);
-    
-    // Guardamos el high score basado en el total de victorias de esta partida
     this.storageService.saveHighScore(this.totalVictories());
     
+    this.defeatedOpponent.set(this.opponent());
+    this.router.navigate(['/cambio']);
+  }
+
+  async applyReplacement(index: number | null) {
+    if (index !== null) {
+      const newPokemon = this.defeatedOpponent();
+      if (newPokemon) {
+        this.team.update(t => {
+          const newTeam = [...t];
+          newTeam[index] = { ...newPokemon, isFainted: false };
+          return newTeam;
+        });
+      }
+    }
+
+    this.defeatedOpponent.set(null);
     if (this.canEvolve()) {
-      await this.evolveTeam();
+      await this.prepareEvolution();
     } else {
       await this.spawnOpponent();
+      this.router.navigate(['/tablero']);
     }
   }
 
-  async evolveTeam() {
+  private async prepareEvolution() {
     const nextTier = (this.currentTier() + 1) as 1 | 2 | 3;
     const evolvedTeam = await Promise.all(
       this.team().map(async (p) => {
@@ -142,18 +173,21 @@ export class GameService {
         return evolved ? { ...evolved, isFainted: false } : { ...p, tier: nextTier, isFainted: false };
       })
     );
-    
-    this.team.set(evolvedTeam);
-    this.currentTier.set(nextTier);
-    this.victories.set(0); 
-    await this.spawnOpponent();
+    this.evolvedTeamPreview.set(evolvedTeam);
+    this.isEvolving.set(true);
+    this.router.navigate(['/tablero']);
+  }
+
+  completeEvolution() {
+    this.team.set(this.evolvedTeamPreview());
+    this.currentTier.update(t => (t + 1) as 1 | 2 | 3);
+    this.victories.set(0);
+    this.isEvolving.set(false);
+    this.evolvedTeamPreview.set([]);
+    this.spawnOpponent();
   }
 
   updatePokemonStatus(id: number, isFainted: boolean) {
     this.team.update(t => t.map(p => p.id === id ? { ...p, isFainted } : p));
-  }
-
-  replacePokemon(oldId: number, newPokemon: Pokemon) {
-    this.team.update(t => t.map(p => p.id === oldId ? newPokemon : p));
   }
 }
