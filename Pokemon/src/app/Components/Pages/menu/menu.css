@@ -55,32 +55,73 @@ h1 {
   gap: 1.5rem;
   z-index: 10;
   width: 100%;
-  max-width: 300px;
+  max-width: 350px;
 }
 
 button {
-  background-color: #f1c40f;
-  color: #2c3e50;
   border: none;
   padding: 1.2rem 2rem;
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: 900;
   border-radius: 50px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 6px 0 #d4ac0d;
+  transition: all 0.2s ease;
   text-transform: uppercase;
+  width: 100%;
+  letter-spacing: 1px;
 }
 
-button:hover {
+.btn-success {
+  background-color: #2ecc71;
+  color: white;
+  box-shadow: 0 6px 0 #27ae60;
+}
+
+.btn-success:hover {
+  background-color: #27ae60;
   transform: translateY(-3px);
-  background-color: #f39c12;
-  box-shadow: 0 9px 0 #d4ac0d;
+  box-shadow: 0 9px 0 #1e8449;
+}
+
+.btn-primary {
+  background-color: #3498db;
+  color: white;
+  box-shadow: 0 6px 0 #2980b9;
+}
+
+.btn-primary:hover {
+  background-color: #2980b9;
+  transform: translateY(-3px);
+  box-shadow: 0 9px 0 #21618c;
+}
+
+.btn-neutral {
+  background-color: #95a5a6;
+  color: white;
+  box-shadow: 0 6px 0 #7f8c8d;
+}
+
+.btn-neutral:hover {
+  background-color: #7f8c8d;
+  transform: translateY(-3px);
+  box-shadow: 0 9px 0 #707b7c;
+}
+
+.btn-danger {
+  background-color: #e74c3c;
+  color: white;
+  box-shadow: 0 6px 0 #c0392b;
+}
+
+.btn-danger:hover {
+  background-color: #c0392b;
+  transform: translateY(-3px);
+  box-shadow: 0 9px 0 #a93226;
 }
 
 button:active {
-  transform: translateY(3px);
-  box-shadow: 0 3px 0 #d4ac0d;
+  transform: translateY(3px) !important;
+  box-shadow: 0 3px 0 rgba(0,0,0,0.2) !important;
 }
 
 /* Estilo del modal */

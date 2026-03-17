@@ -3,10 +3,15 @@
     High Score: {{ highScore() }}
   </div>
 
-  <h1>Pokémon Battle Game</h1>
+  <h1>Juego Pokémon duuuuuuuro</h1>
 
   <div class="options">
-    <button class="btn-primary" (click)="iniciarJuego()">Iniciar</button>
+    @if (hasSavedGame()) {
+      <button class="btn-success" (click)="continuarJuego()">Continuar</button>
+      <button class="btn-primary" (click)="iniciarJuego()">Nueva Partida</button>
+    } @else {
+      <button class="btn-primary" (click)="iniciarJuego()">Iniciar Juego</button>
+    }
     <button class="btn-neutral" (click)="toggleHowToPlay()">¿Cómo jugar?</button>
   </div>
 

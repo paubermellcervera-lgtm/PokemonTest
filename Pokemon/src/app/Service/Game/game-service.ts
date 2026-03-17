@@ -1,4 +1,4 @@
-import { Injectable, computed, inject, signal } from '@angular/core';
+import { Injectable, computed, inject, signal, effect } from '@angular/core';
 import { Router } from '@angular/router';
 import { Pokemon, ALL_STATS } from '../../Model/Pokemon';
 import { PokemonService } from '../Pokemon/pokemon-service';
@@ -11,6 +11,43 @@ export class GameService {
   private pokemonService = inject(PokemonService);
   private storageService = inject(StorageService);
   private router = inject(Router);
+
+  constructor() {
+    this.loadGameState();
+    
+    // Efecto para persistir el estado automáticamente cuando cambien los signals clave
+    effect(() => {
+      const state = {
+        team: this.team(),
+        victories: this.victories(),
+        totalVictories: this.totalVictories(),
+        currentTier: this.currentTier(),
+        rerolls: this.rerolls(),
+        isSelectionPhase: this.isSelectionPhase(),
+        opponent: this.opponent(),
+        selectedStatId: this.selectedStatId(),
+        isEvolving: this.isEvolving(),
+        evolvedTeamPreview: this.evolvedTeamPreview()
+      };
+      this.storageService.saveGameState(state);
+    });
+  }
+
+  private loadGameState() {
+    const savedState = this.storageService.getGameState();
+    if (savedState) {
+      this.team.set(savedState.team);
+      this.victories.set(savedState.victories);
+      this.totalVictories.set(savedState.totalVictories);
+      this.currentTier.set(savedState.currentTier);
+      this.rerolls.set(savedState.rerolls);
+      this.isSelectionPhase.set(savedState.isSelectionPhase);
+      this.opponent.set(savedState.opponent || null);
+      this.selectedStatId.set(savedState.selectedStatId || '');
+      this.isEvolving.set(savedState.isEvolving || false);
+      this.evolvedTeamPreview.set(savedState.evolvedTeamPreview || []);
+    }
+  }
 
   // El equipo ahora se inicializa con 3 espacios (pueden ser null)
   readonly team = signal<(Pokemon | null)[]>([null, null, null]);
@@ -35,10 +72,16 @@ export class GameService {
   });
 
   // Ajustamos para manejar nulos
-  readonly isGameOver = computed(() => 
-    !this.isSelectionPhase() && 
-    this.team().every((p) => p === null || p.isFainted)
-  );
+  readonly isGameOver = computed(() => {
+    const isOver = !this.isSelectionPhase() && 
+    this.team().every((p) => p === null || p.isFainted);
+    
+    if (isOver) {
+      this.storageService.clearGameState();
+    }
+    
+    return isOver;
+  });
 
   readonly canEvolve = computed(() => this.victories() >= 10 && this.currentTier() < 3);
 
@@ -66,10 +109,18 @@ export class GameService {
         return newLs;
       });
       try {
-        const newPokemon = await this.pokemonService.getRandomPokemonByTier(this.currentTier());
+        let newPokemon: Pokemon;
+        let isDuplicate = true;
+        
+        do {
+          newPokemon = await this.pokemonService.getRandomPokemonByTier(this.currentTier());
+          // Comprobamos si el ID ya existe en alguno de los OTROS slots
+          isDuplicate = this.team().some((p, i) => i !== index && p?.id === newPokemon.id);
+        } while (isDuplicate);
+
         this.team.update(currentTeam => {
           const newTeam = [...currentTeam];
-          newTeam[index] = newPokemon; // Insertamos exactamente en su posición
+          newTeam[index] = newPokemon;
           return newTeam;
         });
         const newRerolls = [...currentRerolls];
@@ -94,7 +145,15 @@ export class GameService {
   }
 
   async spawnOpponent() {
-    const rival = await this.pokemonService.getRandomPokemonByTier(this.currentTier());
+    let rival: Pokemon;
+    let isDuplicate = true;
+
+    do {
+      rival = await this.pokemonService.getRandomPokemonByTier(this.currentTier());
+      // El rival no puede ser un pokemon que ya tengamos en el equipo
+      isDuplicate = this.team().some(p => p?.id === rival.id);
+    } while (isDuplicate);
+
     this.opponent.set(rival);
     this.generateRandomStat();
     if (rival.cry) this.playCry(rival.cry);
@@ -159,17 +218,25 @@ export class GameService {
 
   private async prepareEvolution() {
     const nextTier = (this.currentTier() + 1) as 1 | 2 | 3;
-    const currentTeam = this.team() as Pokemon[]; // En este punto ya no hay nulos
-    const evolvedTeam = await Promise.all(
-      currentTeam.map(async (p) => {
-        const evolved = await this.pokemonService.getNextEvolution(
-          p.evolutionChainId!,
-          p.name,
-          p.tier
-        );
-        return evolved ? { ...evolved, isFainted: false } : { ...p, tier: nextTier, isFainted: false };
-      })
-    );
+    const currentTeam = this.team() as Pokemon[];
+    const evolvedTeam: Pokemon[] = [];
+    const usedIds = new Set<number>();
+
+    for (const p of currentTeam) {
+      const evolved = await this.pokemonService.getNextEvolution(
+        p.evolutionChainId!,
+        p.name,
+        p.tier
+      );
+      
+      const finalEvo = (evolved && !usedIds.has(evolved.id)) 
+        ? { ...evolved, isFainted: false } 
+        : { ...p, tier: nextTier, isFainted: false };
+      
+      evolvedTeam.push(finalEvo);
+      usedIds.add(finalEvo.id);
+    }
+
     this.evolvedTeamPreview.set(evolvedTeam);
     this.isEvolving.set(true);
     this.router.navigate(['/tablero']);
