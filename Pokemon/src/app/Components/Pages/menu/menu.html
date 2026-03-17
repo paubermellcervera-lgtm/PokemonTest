@@ -1,5 +1,4 @@
 <div class="menu-container">
-  <!-- Puntuación máxima arriba a la izquierda -->
   <div class="high-score">
     High Score: {{ highScore() }}
   </div>
@@ -7,8 +6,8 @@
   <h1>Pokémon Battle Game</h1>
 
   <div class="options">
-    <button (click)="iniciarJuego()">Iniciar</button>
-    <button (click)="toggleHowToPlay()">¿Cómo jugar?</button>
+    <button class="btn-primary" (click)="iniciarJuego()">Iniciar</button>
+    <button class="btn-neutral" (click)="toggleHowToPlay()">¿Cómo jugar?</button>
   </div>
 
   @if (showHowToPlay()) {
@@ -20,7 +19,7 @@
         <p>3. El Pokémon con el valor más alto en esa estadística gana.</p>
         <p>4. Gana 10 batallas para que tu equipo evolucione.</p>
         <p>5. Si todos tus Pokémon se debilitan, ¡el juego termina!</p>
-        <button (click)="toggleHowToPlay()">Cerrar</button>
+        <button class="btn-danger" (click)="toggleHowToPlay()">Cerrar</button>
       </div>
     </div>
   }

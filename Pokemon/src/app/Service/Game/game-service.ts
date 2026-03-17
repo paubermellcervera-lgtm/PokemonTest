@@ -12,7 +12,8 @@ export class GameService {
   private storageService = inject(StorageService);
   private router = inject(Router);
 
-  readonly team = signal<Pokemon[]>([]);
+  // El equipo ahora se inicializa con 3 espacios (pueden ser null)
+  readonly team = signal<(Pokemon | null)[]>([null, null, null]);
   readonly opponent = signal<Pokemon | null>(null);
   readonly defeatedOpponent = signal<Pokemon | null>(null);
   readonly victories = signal<number>(0);
@@ -23,22 +24,20 @@ export class GameService {
   readonly rerolls = signal<number[]>([3, 3, 3]);
   readonly isSelectionPhase = signal<boolean>(true);
 
-  // Estados para la animación de evolución
   readonly isEvolving = signal<boolean>(false);
   readonly evolvedTeamPreview = signal<Pokemon[]>([]);
 
-  // Configuración de audio
-  readonly volume = signal<number>(0.1); // Bajado al 10% para que sea suave
+  readonly volume = signal<number>(0.1);
 
   readonly selectedStatName = computed(() => {
     const id = this.selectedStatId();
     return ALL_STATS.find(s => s.id === id)?.name || '';
   });
 
+  // Ajustamos para manejar nulos
   readonly isGameOver = computed(() => 
     !this.isSelectionPhase() && 
-    this.team().length > 0 && 
-    this.team().every((p) => p.isFainted)
+    this.team().every((p) => p === null || p.isFainted)
   );
 
   readonly canEvolve = computed(() => this.victories() >= 10 && this.currentTier() < 3);
@@ -47,7 +46,7 @@ export class GameService {
     this.victories.set(0);
     this.totalVictories.set(0);
     this.currentTier.set(1);
-    this.team.set([]);
+    this.team.set([null, null, null]); // Slots vacíos reales
     this.rerolls.set([3, 3, 3]);
     this.isSelectionPhase.set(true);
     this.isEvolving.set(false);
@@ -70,9 +69,8 @@ export class GameService {
         const newPokemon = await this.pokemonService.getRandomPokemonByTier(this.currentTier());
         this.team.update(currentTeam => {
           const newTeam = [...currentTeam];
-          while (newTeam.length <= index) newTeam.push(null as any);
-          newTeam[index] = newPokemon;
-          return newTeam.filter(p => p !== null);
+          newTeam[index] = newPokemon; // Insertamos exactamente en su posición
+          return newTeam;
         });
         const newRerolls = [...currentRerolls];
         newRerolls[index]--;
@@ -88,7 +86,8 @@ export class GameService {
   }
 
   async confirmTeam() {
-    if (this.team().length === 3) {
+    // Solo confirmamos si los 3 slots tienen un pokemon (no son null)
+    if (this.team().every(p => p !== null)) {
       this.isSelectionPhase.set(false);
       await this.spawnOpponent();
     }
@@ -98,11 +97,7 @@ export class GameService {
     const rival = await this.pokemonService.getRandomPokemonByTier(this.currentTier());
     this.opponent.set(rival);
     this.generateRandomStat();
-
-    // Reproducir grito
-    if (rival.cry) {
-      this.playCry(rival.cry);
-    }
+    if (rival.cry) this.playCry(rival.cry);
   }
 
   playCry(url: string) {
@@ -138,7 +133,6 @@ export class GameService {
     this.victories.update(v => v + 1);
     this.totalVictories.update(v => v + 1);
     this.storageService.saveHighScore(this.totalVictories());
-    
     this.defeatedOpponent.set(this.opponent());
     this.router.navigate(['/cambio']);
   }
@@ -154,7 +148,6 @@ export class GameService {
         });
       }
     }
-
     this.defeatedOpponent.set(null);
     if (this.canEvolve()) {
       await this.prepareEvolution();
@@ -166,8 +159,9 @@ export class GameService {
 
   private async prepareEvolution() {
     const nextTier = (this.currentTier() + 1) as 1 | 2 | 3;
+    const currentTeam = this.team() as Pokemon[]; // En este punto ya no hay nulos
     const evolvedTeam = await Promise.all(
-      this.team().map(async (p) => {
+      currentTeam.map(async (p) => {
         const evolved = await this.pokemonService.getNextEvolution(
           p.evolutionChainId!,
           p.name,
@@ -191,6 +185,6 @@ export class GameService {
   }
 
   updatePokemonStatus(id: number, isFainted: boolean) {
-    this.team.update(t => t.map(p => p.id === id ? { ...p, isFainted } : p));
+    this.team.update(t => t.map(p => p && p.id === id ? { ...p, isFainted } : p));
   }
 }
