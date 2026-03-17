@@ -1,5 +1,5 @@
 import { Component, inject, signal, effect } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { GameService } from '../../../Service/Game/game-service';
 import { CartaPokemon } from '../../UI/carta-pokemon/carta-pokemon';
 
@@ -11,10 +11,15 @@ import { CartaPokemon } from '../../UI/carta-pokemon/carta-pokemon';
 })
 export class Tablero {
   readonly gameService = inject(GameService);
+  private router = inject(Router);
 
   // Estados de animación de batalla
   animatingIndex = signal<number | null>(null);
+  animatingRivalIndex = signal<number | null>(null);
   revealRivalStat = signal<boolean>(false);
+
+  // Estado de selección en Liga
+  selectedRivalIndex = signal<number | null>(null);
 
   // Estados de animación de evolución
   isEvolutionWhite = signal<boolean>(false);
@@ -62,8 +67,17 @@ export class Tablero {
     await this.gameService.confirmTeam();
   }
 
+  async volverAlMenu() {
+    await this.gameService.initGame();
+    this.router.navigate(['/menu']);
+  }
+
   get pokemonRival() {
     return this.gameService.opponent();
+  }
+
+  get rivalesLiga() {
+    return this.gameService.opponentTeam();
   }
 
   get miEquipo() {
@@ -82,6 +96,10 @@ export class Tablero {
     return this.gameService.isSelectionPhase();
   }
 
+  get esLiga() {
+    return this.gameService.isLeaguePhase();
+  }
+
   get estadisticaSeleccionada() {
     return this.gameService.selectedStatId();
   }
@@ -90,9 +108,40 @@ export class Tablero {
     return this.gameService.selectedStatName();
   }
 
+  seleccionarRival(index: number) {
+    if (!this.esLiga) return;
+    const rival = this.rivalesLiga[index];
+    if (rival && !rival.isFainted && this.animatingIndex() === null) {
+      this.selectedRivalIndex.set(index);
+    }
+  }
+
   async seleccionarParaBatalla(index: number) {
     const pokemon = this.miEquipo[index];
-    if (pokemon && !pokemon.isFainted && !this.esFaseSeleccion && this.animatingIndex() === null) {
+    if (!pokemon || pokemon.isFainted || this.esFaseSeleccion || this.animatingIndex() !== null) return;
+
+    if (this.esLiga) {
+      const rivalIndex = this.selectedRivalIndex();
+      if (rivalIndex === null) {
+        // Podríamos mostrar un mensaje: "Selecciona primero un rival"
+        return;
+      }
+
+      this.animatingIndex.set(index);
+      this.animatingRivalIndex.set(rivalIndex);
+      
+      await new Promise(resolve => setTimeout(resolve, 600));
+      this.revealRivalStat.set(true);
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      await this.gameService.resolveLeagueBattle(index, rivalIndex);
+      
+      this.animatingIndex.set(null);
+      this.animatingRivalIndex.set(null);
+      this.revealRivalStat.set(false);
+      this.selectedRivalIndex.set(null);
+    } else {
+      // Combate Normal
       this.animatingIndex.set(index);
       await new Promise(resolve => setTimeout(resolve, 600));
       this.revealRivalStat.set(true);

@@ -6,7 +6,11 @@
     </div>
     
     <div class="top-info-bar">
-      <div class="tier-info">Tier actual: <strong>{{ gameService.currentTier() }}</strong></div>
+      @if (esLiga) {
+        <div class="league-info">LIGA POKÉMON: <strong>Ronda {{ gameService.leagueWins() + 1 }} / 4</strong></div>
+      } @else {
+        <div class="tier-info">Tier actual: <strong>{{ gameService.currentTier() }}</strong></div>
+      }
       <div class="total-victories-badge">Victorias Totales: <strong>{{ gameService.totalVictories() }}</strong></div>
     </div>
 
@@ -20,14 +24,33 @@
 
   <div class="battle-area" [class.animating]="animatingIndex() !== null">
     <div class="opponent-side" [class.combat-focus]="animatingIndex() !== null">
-      <h3>Oponente</h3>
-      @if (pokemonRival) {
-        <app-carta-pokemon 
-          [pokemon]="pokemonRival" 
-          [hideStats]="true"
-          [revealed]="revealRivalStat()"
-          [showOnlyStatId]="estadisticaSeleccionada"
-        ></app-carta-pokemon>
+      <h3>{{ esLiga ? 'Alto Mando' : 'Oponente' }}</h3>
+      
+      @if (esLiga) {
+        <div class="league-opponents">
+          @for (rival of rivalesLiga; track $index) {
+            <div class="rival-slot" 
+                 [class.selected-rival]="selectedRivalIndex() === $index"
+                 [class.combat-focus]="animatingRivalIndex() === $index"
+                 (click)="seleccionarRival($index)">
+              <app-carta-pokemon 
+                [pokemon]="rival" 
+                [hideStats]="true"
+                [revealed]="animatingRivalIndex() === $index && revealRivalStat()"
+                [showOnlyStatId]="estadisticaSeleccionada"
+              ></app-carta-pokemon>
+            </div>
+          }
+        </div>
+      } @else {
+        @if (pokemonRival) {
+          <app-carta-pokemon 
+            [pokemon]="pokemonRival" 
+            [hideStats]="true"
+            [revealed]="revealRivalStat()"
+            [showOnlyStatId]="estadisticaSeleccionada"
+          ></app-carta-pokemon>
+        }
       }
     </div>
 
@@ -40,7 +63,13 @@
           } @else {
             <div class="vs-container"><span class="vs-text">VS</span></div>
             <div class="stat-focus"><span class="stat-badge">{{ nombreEstadistica }}</span></div>
-            <div class="evolution-progress">Evolución: <strong>{{ gameService.victories() }} / 10</strong></div>
+            @if (!esLiga) {
+              <div class="evolution-progress">Evolución: <strong>{{ gameService.victories() }} / 10</strong></div>
+            } @else {
+              <div class="league-prompt">
+                {{ selectedRivalIndex() === null ? 'Selecciona un rival' : '¡Elige a tu Pokémon!' }}
+              </div>
+            }
           }
         </div>
       } @else {
@@ -78,6 +107,7 @@
                 [showOnlyStatId]="esFaseSeleccion ? null : estadisticaSeleccionada"
                 (click)="seleccionarParaBatalla(slot)"
                 [class.selectable]="!esFaseSeleccion && miEquipo[slot] && !miEquipo[slot]!.isFainted"
+                [class.fainted]="miEquipo[slot]?.isFainted"
               ></app-carta-pokemon>
             }
           </div>
@@ -99,6 +129,19 @@
       <h2>¡DERROTA!</h2>
       <p>Has conseguido {{ gameService.totalVictories() }} victorias.</p>
       <button routerLink="/menu" class="btn-danger">Volver al Inicio</button>
+    </div>
+  }
+
+  @if (gameService.isLeagueVictory()) {
+    <div class="game-over-modal victory-modal">
+      <h2>🎉 ¡NUEVO CAMPEÓN! 🎉</h2>
+      <p>Has superado la Liga Pokémon con honor.</p>
+      <div class="final-team">
+        @for (p of miEquipo; track $index) {
+          @if (p) { <img [src]="p.image" class="winner-img"> }
+        }
+      </div>
+      <button (click)="volverAlMenu()" class="btn-success">Volver al Menú Principal</button>
     </div>
   }
 </div>

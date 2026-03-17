@@ -17,6 +17,12 @@ export class GameService {
     
     // Efecto para persistir el estado automáticamente cuando cambien los signals clave
     effect(() => {
+      // Si el juego ha terminado, borramos el estado y no guardamos nada nuevo
+      if (this.isGameOver()) {
+        this.storageService.clearGameState();
+        return;
+      }
+
       const state = {
         team: this.team(),
         victories: this.victories(),
@@ -27,7 +33,11 @@ export class GameService {
         opponent: this.opponent(),
         selectedStatId: this.selectedStatId(),
         isEvolving: this.isEvolving(),
-        evolvedTeamPreview: this.evolvedTeamPreview()
+        evolvedTeamPreview: this.evolvedTeamPreview(),
+        // Persistencia Liga
+        isLeaguePhase: this.isLeaguePhase(),
+        leagueWins: this.leagueWins(),
+        opponentTeam: this.opponentTeam()
       };
       this.storageService.saveGameState(state);
     });
@@ -46,10 +56,15 @@ export class GameService {
       this.selectedStatId.set(savedState.selectedStatId || '');
       this.isEvolving.set(savedState.isEvolving || false);
       this.evolvedTeamPreview.set(savedState.evolvedTeamPreview || []);
+      
+      // Cargar Liga
+      this.isLeaguePhase.set(savedState.isLeaguePhase || false);
+      this.leagueWins.set(savedState.leagueWins || 0);
+      this.opponentTeam.set(savedState.opponentTeam || [null, null, null]);
     }
   }
 
-  // El equipo ahora se inicializa con 3 espacios (pueden ser null)
+  // Signals básicos
   readonly team = signal<(Pokemon | null)[]>([null, null, null]);
   readonly opponent = signal<Pokemon | null>(null);
   readonly defeatedOpponent = signal<Pokemon | null>(null);
@@ -64,6 +79,11 @@ export class GameService {
   readonly isEvolving = signal<boolean>(false);
   readonly evolvedTeamPreview = signal<Pokemon[]>([]);
 
+  // Signals Liga
+  readonly isLeaguePhase = signal<boolean>(false);
+  readonly leagueWins = signal<number>(0);
+  readonly opponentTeam = signal<(Pokemon | null)[]>([null, null, null]);
+
   readonly volume = signal<number>(0.1);
 
   readonly selectedStatName = computed(() => {
@@ -71,17 +91,12 @@ export class GameService {
     return ALL_STATS.find(s => s.id === id)?.name || '';
   });
 
-  // Ajustamos para manejar nulos
-  readonly isGameOver = computed(() => {
-    const isOver = !this.isSelectionPhase() && 
-    this.team().every((p) => p === null || p.isFainted);
-    
-    if (isOver) {
-      this.storageService.clearGameState();
-    }
-    
-    return isOver;
-  });
+  readonly isGameOver = computed(() => 
+    !this.isSelectionPhase() && 
+    this.team().every((p) => p === null || p.isFainted)
+  );
+
+  readonly isLeagueVictory = computed(() => this.isLeaguePhase() && this.leagueWins() >= 4);
 
   readonly canEvolve = computed(() => this.victories() >= 10 && this.currentTier() < 3);
 
@@ -89,13 +104,20 @@ export class GameService {
     this.victories.set(0);
     this.totalVictories.set(0);
     this.currentTier.set(1);
-    this.team.set([null, null, null]); // Slots vacíos reales
+    this.team.set([null, null, null]);
     this.rerolls.set([3, 3, 3]);
     this.isSelectionPhase.set(true);
     this.isEvolving.set(false);
     this.opponent.set(null);
     this.defeatedOpponent.set(null);
     this.evolvedTeamPreview.set([]);
+    
+    // Reset Liga
+    this.isLeaguePhase.set(false);
+    this.leagueWins.set(0);
+    this.opponentTeam.set([null, null, null]);
+
+    this.storageService.clearGameState();
   }
 
   readonly loadingSlots = signal<boolean[]>([false, false, false]);
@@ -114,7 +136,6 @@ export class GameService {
         
         do {
           newPokemon = await this.pokemonService.getRandomPokemonByTier(this.currentTier());
-          // Comprobamos si el ID ya existe en alguno de los OTROS slots
           isDuplicate = this.team().some((p, i) => i !== index && p?.id === newPokemon.id);
         } while (isDuplicate);
 
@@ -137,7 +158,6 @@ export class GameService {
   }
 
   async confirmTeam() {
-    // Solo confirmamos si los 3 slots tienen un pokemon (no son null)
     if (this.team().every(p => p !== null)) {
       this.isSelectionPhase.set(false);
       await this.spawnOpponent();
@@ -150,7 +170,6 @@ export class GameService {
 
     do {
       rival = await this.pokemonService.getRandomPokemonByTier(this.currentTier());
-      // El rival no puede ser un pokemon que ya tengamos en el equipo
       isDuplicate = this.team().some(p => p?.id === rival.id);
     } while (isDuplicate);
 
@@ -183,7 +202,9 @@ export class GameService {
       return true;
     } else {
       this.updatePokemonStatus(playerPokemon.id, true);
-      await this.spawnOpponent();
+      if (!this.isGameOver()) {
+        await this.spawnOpponent();
+      }
       return false;
     }
   }
@@ -192,9 +213,85 @@ export class GameService {
     this.victories.update(v => v + 1);
     this.totalVictories.update(v => v + 1);
     this.storageService.saveHighScore(this.totalVictories());
-    this.defeatedOpponent.set(this.opponent());
-    this.router.navigate(['/cambio']);
+    
+    if (this.totalVictories() >= 40) {
+      await this.startLeague();
+    } else {
+      this.defeatedOpponent.set(this.opponent());
+      this.router.navigate(['/cambio']);
+    }
   }
+
+  // --- LIGA POKEMON ---
+
+  async startLeague() {
+    this.isLeaguePhase.set(true);
+    this.leagueWins.set(0);
+    // Curamos al equipo para la liga
+    this.team.update(t => t.map(p => p ? { ...p, isFainted: false } : null));
+    await this.spawnLeagueOpponents();
+    this.router.navigate(['/tablero']);
+  }
+
+  async spawnLeagueOpponents() {
+    const enemies: Pokemon[] = [];
+    const usedIds = new Set<number>();
+
+    for (let i = 0; i < 3; i++) {
+      let p: Pokemon;
+      do {
+        p = await this.pokemonService.getRandomPokemonByTier(3);
+      } while (usedIds.has(p.id) || this.team().some(tp => tp?.id === p.id));
+      
+      enemies.push({ ...p, isFainted: false });
+      usedIds.add(p.id);
+    }
+    this.opponentTeam.set(enemies);
+    this.generateRandomStat();
+  }
+
+  async resolveLeagueBattle(playerIndex: number, opponentIndex: number) {
+    const myMon = this.team()[playerIndex];
+    const enemyMon = this.opponentTeam()[opponentIndex];
+    const statId = this.selectedStatId();
+
+    if (!myMon || !enemyMon || myMon.isFainted || enemyMon.isFainted) return;
+
+    const myVal = myMon.stats.find(s => s.name === statId)?.value || 0;
+    const enemyVal = enemyMon.stats.find(s => s.name === statId)?.value || 0;
+
+    if (myVal >= enemyVal) {
+      // Gana jugador
+      this.updateOpponentStatus(opponentIndex, true);
+    } else {
+      // Gana rival
+      this.updatePokemonStatus(myMon.id, true);
+    }
+
+    // Verificar si la ronda ha terminado
+    const enemyWiped = this.opponentTeam().every(p => p === null || p.isFainted);
+    
+    if (enemyWiped) {
+      this.leagueWins.update(w => w + 1);
+      if (this.leagueWins() < 4) {
+        await this.spawnLeagueOpponents();
+      }
+    } else {
+      this.generateRandomStat();
+    }
+  }
+
+  updateOpponentStatus(index: number, isFainted: boolean) {
+    this.opponentTeam.update(t => {
+      const newTeam = [...t];
+      if (newTeam[index]) {
+        newTeam[index] = { ...newTeam[index]!, isFainted };
+      }
+      return newTeam;
+    });
+  }
+
+  // --- FIN LIGA ---
 
   async applyReplacement(index: number | null) {
     if (index !== null) {
