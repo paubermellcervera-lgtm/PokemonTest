@@ -74,6 +74,7 @@ export class GameService {
   readonly selectedStatId = signal<string>('');
   
   readonly rerolls = signal<number[]>([3, 3, 3]);
+  readonly isRerollGlobalCooldown = signal<boolean>(false);
   readonly isSelectionPhase = signal<boolean>(true);
 
   readonly isEvolving = signal<boolean>(false);
@@ -106,6 +107,7 @@ export class GameService {
     this.currentTier.set(1);
     this.team.set([null, null, null]);
     this.rerolls.set([3, 3, 3]);
+    this.isRerollGlobalCooldown.set(false);
     this.isSelectionPhase.set(true);
     this.isEvolving.set(false);
     this.opponent.set(null);
@@ -124,7 +126,9 @@ export class GameService {
 
   async generatePokemonForSlot(index: number) {
     const currentRerolls = this.rerolls();
-    if (currentRerolls[index] > 0) {
+    if (currentRerolls[index] > 0 && !this.isRerollGlobalCooldown()) {
+      this.isRerollGlobalCooldown.set(true);
+      
       this.loadingSlots.update(ls => {
         const newLs = [...ls];
         newLs[index] = true;
@@ -153,6 +157,10 @@ export class GameService {
           newLs[index] = false;
           return newLs;
         });
+        // Esperar 1 segundo antes de permitir otro reroll
+        setTimeout(() => {
+          this.isRerollGlobalCooldown.set(false);
+        }, 1000);
       }
     }
   }

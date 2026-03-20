@@ -1,0 +1,39 @@
+/* CARTA POKEMON MOVIL */
+
+.card-container {
+  min-height: 14rem;
+  padding: 0.75rem;
+  border-width: 0.15rem;
+}
+
+.pokemon-image img {
+  width: 6rem;
+  height: 6rem;
+}
+
+.pokemon-info h3 {
+  font-size: 0.85rem;
+  margin: 0.5rem 0;
+}
+
+.tier-badge {
+  font-size: 0.65rem;
+}
+
+.stats-list {
+  font-size: 0.6rem;
+  margin-top: 0.5rem;
+}
+
+.stats-list li {
+  margin-bottom: 0.25rem;
+}
+
+.empty-slot {
+  font-size: 1.5rem;
+}
+
+.spinner {
+  width: 1.5rem;
+  height: 1.5rem;
+}

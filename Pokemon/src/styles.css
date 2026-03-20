@@ -1,10 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
 /* Global Styles */
 html, body {
   margin: 0;
   padding: 0;
   width: 100%;
   height: 100%;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.875rem; /* Equivalente a 14px */
 }
 
 * {
@@ -14,14 +17,14 @@ html, body {
 /* SISTEMA DE BOTONES 3D */
 .btn-primary, .btn-success, .btn-danger, .btn-warning, .btn-neutral {
   border: none;
-  padding: 12px 24px;
+  padding: 0.75rem 1.5rem;
   font-size: 1.1rem;
   font-weight: 900;
-  border-radius: 50px;
+  border-radius: 3rem;
   cursor: pointer;
   transition: all 0.2s ease;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.06rem;
   display: inline-block;
   text-decoration: none;
   text-align: center;
@@ -31,52 +34,52 @@ html, body {
 .btn-primary {
   background-color: #f1c40f;
   color: #2c3e50;
-  box-shadow: 0 5px 0 #d4ac0d;
+  box-shadow: 0 0.3rem 0 #d4ac0d;
 }
-.btn-primary:hover { transform: translateY(-2px); background-color: #f39c12; box-shadow: 0 7px 0 #d4ac0d; }
-.btn-primary:active { transform: translateY(3px); box-shadow: 0 2px 0 #d4ac0d; }
+.btn-primary:hover { transform: translateY(-0.125rem); background-color: #f39c12; box-shadow: 0 0.4rem 0 #d4ac0d; }
+.btn-primary:active { transform: translateY(0.18rem); box-shadow: 0 0.125rem 0 #d4ac0d; }
 
 /* VERDE (Confirmar / Ganar / Sustituir) */
 .btn-success {
   background-color: #2ecc71;
   color: white;
-  box-shadow: 0 5px 0 #27ae60;
+  box-shadow: 0 0.3rem 0 #27ae60;
 }
-.btn-success:hover { transform: translateY(-2px); background-color: #27ae60; box-shadow: 0 7px 0 #27ae60; }
-.btn-success:active { transform: translateY(3px); box-shadow: 0 2px 0 #27ae60; }
+.btn-success:hover { transform: translateY(-0.125rem); background-color: #27ae60; box-shadow: 0 0.4rem 0 #27ae60; }
+.btn-success:active { transform: translateY(0.18rem); box-shadow: 0 0.125rem 0 #27ae60; }
 
 /* ROJO (Cancelar / Derrota / Volver) */
 .btn-danger {
   background-color: #e74c3c;
   color: white;
-  box-shadow: 0 5px 0 #c0392b;
+  box-shadow: 0 0.3rem 0 #c0392b;
 }
-.btn-danger:hover { transform: translateY(-2px); background-color: #c0392b; box-shadow: 0 7px 0 #c0392b; }
-.btn-danger:active { transform: translateY(3px); box-shadow: 0 2px 0 #c0392b; }
+.btn-danger:hover { transform: translateY(-0.125rem); background-color: #c0392b; box-shadow: 0 0.4rem 0 #c0392b; }
+.btn-danger:active { transform: translateY(0.18rem); box-shadow: 0 0.125rem 0 #c0392b; }
 
 /* NARANJA (Reroll / Secundarios) */
 .btn-warning {
   background-color: #e67e22;
   color: white;
-  box-shadow: 0 5px 0 #d35400;
+  box-shadow: 0 0.3rem 0 #d35400;
 }
-.btn-warning:hover { transform: translateY(-2px); background-color: #d35400; box-shadow: 0 7px 0 #d35400; }
-.btn-warning:active { transform: translateY(3px); box-shadow: 0 2px 0 #d35400; }
+.btn-warning:hover { transform: translateY(-0.125rem); background-color: #d35400; box-shadow: 0 0.4rem 0 #d35400; }
+.btn-warning:active { transform: translateY(0.18rem); box-shadow: 0 0.125rem 0 #d35400; }
 
 /* GRIS (Atrás / Cerrar) */
 .btn-neutral {
   background-color: #95a5a6;
   color: white;
-  box-shadow: 0 5px 0 #7f8c8d;
+  box-shadow: 0 0.3rem 0 #7f8c8d;
 }
-.btn-neutral:hover { transform: translateY(-2px); background-color: #7f8c8d; box-shadow: 0 7px 0 #7f8c8d; }
-.btn-neutral:active { transform: translateY(3px); box-shadow: 0 2px 0 #7f8c8d; }
+.btn-neutral:hover { transform: translateY(-0.125rem); background-color: #7f8c8d; box-shadow: 0 0.4rem 0 #7f8c8d; }
+.btn-neutral:active { transform: translateY(0.18rem); box-shadow: 0 0.125rem 0 #7f8c8d; }
 
 /* Estados deshabilitados */
 button:disabled {
   background-color: #ccc !important;
   color: #888 !important;
-  box-shadow: 0 5px 0 #aaa !important;
+  box-shadow: 0 0.3rem 0 #aaa !important;
   cursor: not-allowed !important;
   transform: none !important;
 }

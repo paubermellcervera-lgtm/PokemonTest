@@ -2,7 +2,8 @@
   
   <div class="header">
     <div class="header-nav">
-      <button routerLink="/menu" class="btn-neutral">⬅ Menú</button>
+      <button routerLink="/menu" class="btn-danger">⬅ Menú</button>
+      
     </div>
     
     <div class="top-info-bar">
@@ -62,7 +63,9 @@
             <h2 class="evo-text">¡EVOLUCIÓN!</h2>
           } @else {
             <div class="vs-container"><span class="vs-text">VS</span></div>
+            <br>
             <div class="stat-focus"><span class="stat-badge">{{ nombreEstadistica }}</span></div>
+            <br>
             @if (!esLiga) {
               <div class="evolution-progress">Evolución: <strong>{{ gameService.victories() }} / 10</strong></div>
             } @else {
@@ -85,8 +88,8 @@
           <div class="slot-container" [class.combat-focus]="animatingIndex() === slot">
             @if (esFaseSeleccion) {
               <div class="reroll-controls">
-                <button (click)="reroll(slot)" [disabled]="rerolls[slot] === 0" class="btn-warning">
-                  Reroll ({{ rerolls[slot] }})
+                <button (click)="reroll(slot)" [disabled]="rerolls[slot] === 0 || gameService.isRerollGlobalCooldown()" class="btn-warning">
+                  <i class="fa-solid fa-recycle"></i> Reroll ({{ rerolls[slot] }})
                 </button>
               </div>
             }
@@ -145,3 +148,4 @@
     </div>
   }
 </div>
+<button (click)="Chetos()" class="btn-success">Chetos</button>

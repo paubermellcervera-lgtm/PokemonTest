@@ -151,4 +151,11 @@ export class Tablero {
       this.revealRivalStat.set(false);
     }
   }
+
+
+  Chetos() {
+    this.gameService.totalVictories.set(40);
+  }
+
 }
+

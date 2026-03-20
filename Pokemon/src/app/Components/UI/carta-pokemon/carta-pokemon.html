@@ -13,11 +13,10 @@
     
     <div class="pokemon-info">
       <h3>{{ p.name | titlecase }}</h3>
-      <p class="tier-badge">Tier {{ p.tier }}</p>
+    
 
       <ul class="stats-list">
         @if (hideStats() && !revealed()) {
-          <!-- El rival ahora solo muestra la stat de la pelea con ??? -->
           @for (stat of statsFiltradas; track stat.name) {
             <li>
               <span class="stat-name">{{ stat.name }}:</span>
@@ -25,7 +24,6 @@
             </li>
           }
         } @else {
-          <!-- Jugador o Rival revelado -->
           @for (stat of statsFiltradas; track stat.name) {
             <li>
               <span class="stat-name">{{ stat.name }}:</span>

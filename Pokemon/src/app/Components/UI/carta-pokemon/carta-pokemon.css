@@ -1,20 +1,24 @@
+@import url('./carta-pokemon-movil.css') (max-width: 768px);
+
 :host {
   display: block;
   width: 100%;
 }
 
 .card-container {
-  border: 2px solid #333;
-  border-radius: 8px;
-  padding: 1rem;
+  border: 0.2rem solid #333;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
   background-color: white;
   text-align: center;
   position: relative;
   transition: all 0.3s ease;
-  min-height: 250px;
+  min-height: 16rem;
+  min-width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  font-family: 'Press Start 2P', cursive;
 }
 
 .card-container.fainted {
@@ -22,7 +26,6 @@
   border-color: #999;
 }
 
-/* FILTRO DE DESMAYO: Grayscale + Opacidad para la imagen */
 .card-container.fainted img {
   filter: grayscale(100%);
   opacity: 0.5;
@@ -33,17 +36,31 @@
 }
 
 .pokemon-image img {
-  max-width: 120px;
-  height: auto;
-  image-rendering: pixelated; /* Para que los sprites se vean nítidos */
+  width: 7rem;
+  height: 7rem;
+  max-width: 100%;
+  image-rendering: pixelated; 
+}
+
+.pokemon-info h3 {
+  font-size: 0.8rem;
+  margin: 0.25rem 0;
 }
 
 .stats-list {
   list-style: none;
   padding: 0;
-  margin: 10px 0 0 0;
+  margin: 0.4rem 0 0 0;
   text-align: left;
-  font-size: 0.9rem;
+  font-size: 0.65rem;
+}
+
+.stats-list li {
+  margin-bottom: 0.2rem;
+}
+
+.stats-list li:last-child {
+  margin-bottom: 0;
 }
 
 .stat-name {
@@ -57,7 +74,6 @@
   font-weight: bold;
 }
 
-/* SPINNER */
 .spinner-overlay {
   position: absolute;
   top: 0;
@@ -69,14 +85,14 @@
   align-items: center;
   justify-content: center;
   z-index: 10;
-  border-radius: 8px;
+  border-radius: 0.5rem;
 }
 
 .spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #3498db;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 0.25rem solid #f3f3f3;
+  border-top: 0.25rem solid #3498db;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -86,9 +102,20 @@
   100% { transform: rotate(360deg); }
 }
 
-.selectable:hover {
+.selectable {
   cursor: pointer;
-  transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  animation: pulse-border 2s infinite ease-in-out;
+}
+
+.selectable:hover {
+  transform: translateY(-0.8rem) scale(1.05);
+  box-shadow: 0 1rem 2rem rgba(52, 152, 219, 0.5);
   border-color: #3498db;
+  z-index: 10;
+}
+
+@keyframes pulse-border {
+  0% { box-shadow: 0 0 0.5rem rgba(52, 152, 219, 0.2); }
+  50% { box-shadow: 0 0 1.2rem rgba(52, 152, 219, 0.6); }
+  100% { box-shadow: 0 0 0.5rem rgba(52, 152, 219, 0.2); }
 }

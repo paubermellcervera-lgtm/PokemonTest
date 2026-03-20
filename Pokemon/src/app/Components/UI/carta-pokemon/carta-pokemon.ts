@@ -13,12 +13,11 @@ export class CartaPokemon {
   hideStats = input<boolean>(false);
   showOnlyStatId = input<string | null>(null);
   isLoading = input<boolean>(false);
-  revealed = input<boolean>(false); // Nueva entrada para activar la revelación
+  revealed = input<boolean>(false); 
 
   displayValues = signal<{ [key: string]: number }>({});
 
   constructor() {
-    // Efecto para animar el contador cuando se revela
     effect(() => {
       if (this.revealed() && this.pokemon()) {
         this.animateStats();
@@ -33,7 +32,7 @@ export class CartaPokemon {
     stats.forEach(stat => {
       let current = 0;
       const target = stat.value;
-      const duration = 1000; // 1 segundo de animación
+      const duration = 1000; 
       const steps = 20;
       const increment = target / steps;
       const intervalTime = duration / steps;
