@@ -37,3 +37,9 @@
   width: 1.5rem;
   height: 1.5rem;
 }
+.selectable:hover {
+  cursor: pointer;
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  border-color: #3498db;
+}

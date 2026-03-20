@@ -1,47 +1,72 @@
 /* CAMBIO MOVIL */
 
 .cambio-container {
-  padding: 1rem 0.5rem;
-  gap: 1rem;
+  padding: 0.5rem;
+  gap: 0.5rem;
+  justify-content: flex-start;
 }
 
 .header {
-  padding: 1rem 1.5rem;
+  padding: 0.5rem 1rem;
   max-width: 95%;
+  margin-bottom: 0.25rem;
 }
 
 .header h1 {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
+  margin-bottom: 0.1rem;
 }
 
 .header p {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
 }
 
 .exchange-area {
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 0.5rem;
+  width: 100%;
 }
 
-.vs {
-  font-size: 1.5rem;
-  padding: 5px 10px;
+.prize-section h3, .team-section h3 {
+  font-size: 0.8rem;
+  margin-bottom: 0.25rem;
+  padding: 0.2rem 0.5rem;
 }
 
 .prize-section app-carta-pokemon {
-  max-width: 15rem;
+  max-width: 9rem; /* Carta más pequeña para el premio */
+}
+
+.divider {
+  margin: 0.1rem 0;
+}
+
+.vs {
+  font-size: 1rem;
+  padding: 3px 8px;
 }
 
 .team-grid {
-  grid-template-columns: 1fr;
-  gap: 0.75rem;
+  grid-template-columns: repeat(3, 1fr); /* 3 Pokémon en una fila */
+  gap: 0.4rem;
+  width: 100%;
+}
+
+.team-section p {
+  font-size: 0.65rem;
+  margin-bottom: 0.25rem;
 }
 
 .replace-overlay {
-  font-size: 0.9rem;
+  font-size: 0.7rem;
+}
+
+.fainted-overlay {
+  font-size: 0.7rem;
 }
 
 .btn-cancel {
-  padding: 0.75rem 2rem;
-  font-size: 1rem;
+  padding: 0.5rem 1.5rem;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
 }

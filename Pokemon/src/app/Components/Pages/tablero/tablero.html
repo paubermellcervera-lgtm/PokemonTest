@@ -33,6 +33,8 @@
             <div class="rival-slot" 
                  [class.selected-rival]="selectedRivalIndex() === $index"
                  [class.combat-focus]="animatingRivalIndex() === $index"
+                 [class.selectable]="esLiga && rival && !rival.isFainted && selectedRivalIndex() === null"
+                 [class.fainted]="rival?.isFainted"
                  (click)="seleccionarRival($index)">
               <app-carta-pokemon 
                 [pokemon]="rival" 
@@ -109,7 +111,7 @@
                 [isLoading]="gameService.loadingSlots()[slot]"
                 [showOnlyStatId]="esFaseSeleccion ? null : estadisticaSeleccionada"
                 (click)="seleccionarParaBatalla(slot)"
-                [class.selectable]="!esFaseSeleccion && miEquipo[slot] && !miEquipo[slot]!.isFainted"
+                [class.selectable]="!esFaseSeleccion && miEquipo[slot] && !miEquipo[slot]!.isFainted && (!esLiga || selectedRivalIndex() !== null)"
                 [class.fainted]="miEquipo[slot]?.isFainted"
               ></app-carta-pokemon>
             }

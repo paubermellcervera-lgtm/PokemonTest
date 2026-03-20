@@ -199,13 +199,31 @@
 }
 
 .rival-slot {
-  cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
 }
 
-.rival-slot:hover:not(.fainted) {
-  transform: translateY(-0.3rem);
+.rival-slot.selectable {
+  cursor: pointer;
+  animation: pulse-border-red 2s infinite ease-in-out;
+}
+
+.rival-slot.selectable:hover {
+  transform: translateY(-0.5rem) scale(1.05);
+  filter: drop-shadow(0 0.8rem 1.5rem rgba(231, 76, 60, 0.6));
+  z-index: 10;
+}
+
+.rival-slot.fainted {
+  opacity: 0.6;
+  filter: grayscale(80%);
+  pointer-events: none;
+}
+
+@keyframes pulse-border-red {
+  0% { box-shadow: 0 0 0.5rem rgba(231, 76, 60, 0.3); }
+  50% { box-shadow: 0 0 1rem rgba(231, 76, 60, 0.7); }
+  100% { box-shadow: 0 0 0.5rem rgba(231, 76, 60, 0.3); }
 }
 
 .selected-rival {
