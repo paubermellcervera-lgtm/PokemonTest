@@ -1,12 +1,13 @@
 @import url('./cambio-movil.css') (max-width: 768px);
 
 .cambio-container {
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
   padding: 1rem;
-  height: 100vh;
+  min-height: 100vh;
   width: 100%;
   background-image: url('/img/Fondo Combate.webp');
   background-size: cover;
@@ -15,7 +16,8 @@
   background-attachment: fixed;
   text-align: center;
   font-family: Arial, sans-serif;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .header {
@@ -99,7 +101,7 @@
 
 .team-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1rem;
 }
 
@@ -175,6 +177,17 @@
   background-color: #c0392b;
   transform: translateY(-3px);
   box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+}
+
+/* Allow cards to expand to show all stats when zoomed */
+::ng-deep .cambio-container app-carta-pokemon .card-container {
+  height: auto !important;
+  min-height: max-content !important;
+  overflow: visible !important;
+}
+
+::ng-deep .cambio-container app-carta-pokemon .pokemon-image img {
+  max-height: 15rem !important;
 }
 
 @media (max-width: 900px) {
