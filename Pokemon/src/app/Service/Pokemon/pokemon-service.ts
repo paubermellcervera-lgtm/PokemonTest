@@ -23,6 +23,7 @@ export class PokemonService {
       image: data.sprites.front_default, // Sprite clásico
       cry: data.cries?.latest, // Grito del pokemon
       tier: tier,
+      types: data.types.map((t: any) => t.type.name),
       isFainted: false,
       evolutionChainId: chainId,
       stats: data.stats.map((s: any) => ({

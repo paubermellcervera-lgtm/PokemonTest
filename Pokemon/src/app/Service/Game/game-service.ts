@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { Pokemon, ALL_STATS } from '../../Model/Pokemon';
 import { PokemonService } from '../Pokemon/pokemon-service';
 import { StorageService } from '../storage-service';
+import { getMaxTypeEffectiveness } from '../../Utils/type-effectiveness';
 
 @Injectable({
   providedIn: 'root',
@@ -205,7 +206,19 @@ export class GameService {
     const playerStatValue = playerPokemon.stats.find(s => s.name === statId)?.value || 0;
     const rivalStatValue = rival.stats.find(s => s.name === statId)?.value || 0;
 
-    if (playerStatValue >= rivalStatValue) {
+    // Calcular ventaja/desventaja de tipo
+    const multiplier = getMaxTypeEffectiveness(playerPokemon.types, rival.types);
+    let bonus = 1;
+    
+    if (multiplier >= 4) bonus = 1.30;
+    else if (multiplier >= 2) bonus = 1.15;
+    else if (multiplier <= 0) bonus = 0; // Inmunidad
+    else if (multiplier <= 0.25) bonus = 0.70; // Desventaja x4
+    else if (multiplier <= 0.5) bonus = 0.85; // Desventaja x2
+
+    const effectivePlayerStat = playerStatValue * bonus;
+
+    if (effectivePlayerStat >= rivalStatValue) {
       await this.winBattle();
       return true;
     } else {
@@ -268,7 +281,19 @@ export class GameService {
     const myVal = myMon.stats.find(s => s.name === statId)?.value || 0;
     const enemyVal = enemyMon.stats.find(s => s.name === statId)?.value || 0;
 
-    if (myVal >= enemyVal) {
+    // Calcular ventaja/desventaja de tipo
+    const multiplier = getMaxTypeEffectiveness(myMon.types, enemyMon.types);
+    let bonus = 1;
+    
+    if (multiplier >= 4) bonus = 1.30;
+    else if (multiplier >= 2) bonus = 1.15;
+    else if (multiplier <= 0) bonus = 0; // Inmunidad
+    else if (multiplier <= 0.25) bonus = 0.70; // Desventaja x4
+    else if (multiplier <= 0.5) bonus = 0.85; // Desventaja x2
+
+    const effectiveMyVal = myVal * bonus;
+
+    if (effectiveMyVal >= enemyVal) {
       // Gana jugador
       this.updateOpponentStatus(opponentIndex, true);
     } else {

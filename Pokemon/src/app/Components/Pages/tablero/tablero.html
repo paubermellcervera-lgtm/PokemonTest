@@ -75,6 +75,11 @@
                 {{ selectedRivalIndex() === null ? 'Selecciona un rival' : '¡Elige a tu Pokémon!' }}
               </div>
             }
+            @if (showMultiplier() && getMultiplierText()) {
+              <div class="multiplier-reveal" [class.advantage]="currentMultiplier() > 1" [class.disadvantage]="currentMultiplier() < 1">
+                {{ getMultiplierText() }}
+              </div>
+            }
           }
         </div>
       } @else {
@@ -113,6 +118,8 @@
                 (click)="seleccionarParaBatalla(slot)"
                 [class.selectable]="!esFaseSeleccion && miEquipo[slot] && !miEquipo[slot]!.isFainted && (!esLiga || selectedRivalIndex() !== null)"
                 [class.fainted]="miEquipo[slot]?.isFainted"
+                [revealed]="animatingIndex() === slot"
+                [multiplier]="animatingIndex() === slot && showMultiplier() ? currentMultiplierWithBonus() : 1"
               ></app-carta-pokemon>
             }
           </div>

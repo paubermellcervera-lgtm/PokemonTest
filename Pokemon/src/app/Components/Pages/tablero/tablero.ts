@@ -1,7 +1,8 @@
-import { Component, inject, signal, effect } from '@angular/core';
+import { Component, inject, signal, effect, computed } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { GameService } from '../../../Service/Game/game-service';
 import { CartaPokemon } from '../../UI/carta-pokemon/carta-pokemon';
+import { getMaxTypeEffectiveness } from '../../../Utils/type-effectiveness';
 
 @Component({
   selector: 'app-tablero',
@@ -17,6 +18,8 @@ export class Tablero {
   animatingIndex = signal<number | null>(null);
   animatingRivalIndex = signal<number | null>(null);
   revealRivalStat = signal<boolean>(false);
+  showMultiplier = signal<boolean>(false);
+  currentMultiplier = signal<number>(1);
 
   // Estado de selección en Liga
   selectedRivalIndex = signal<number | null>(null);
@@ -122,16 +125,19 @@ export class Tablero {
 
     if (this.esLiga) {
       const rivalIndex = this.selectedRivalIndex();
-      if (rivalIndex === null) {
-        // Podríamos mostrar un mensaje: "Selecciona primero un rival"
-        return;
-      }
+      const rival = this.rivalesLiga[rivalIndex!];
+      if (rivalIndex === null || !rival) return;
 
       this.animatingIndex.set(index);
       this.animatingRivalIndex.set(rivalIndex);
       
       await new Promise(resolve => setTimeout(resolve, 600));
       this.revealRivalStat.set(true);
+      
+      // Mostrar Multiplicador
+      this.currentMultiplier.set(getMaxTypeEffectiveness(pokemon.types, rival.types));
+      await new Promise(resolve => setTimeout(resolve, 800));
+      this.showMultiplier.set(true);
       await new Promise(resolve => setTimeout(resolve, 1500));
       
       await this.gameService.resolveLeagueBattle(index, rivalIndex);
@@ -139,19 +145,50 @@ export class Tablero {
       this.animatingIndex.set(null);
       this.animatingRivalIndex.set(null);
       this.revealRivalStat.set(false);
+      this.showMultiplier.set(false);
       this.selectedRivalIndex.set(null);
     } else {
       // Combate Normal
+      const rival = this.pokemonRival;
+      if (!rival) return;
+
       this.animatingIndex.set(index);
       await new Promise(resolve => setTimeout(resolve, 600));
       this.revealRivalStat.set(true);
+
+      // Mostrar Multiplicador
+      this.currentMultiplier.set(getMaxTypeEffectiveness(pokemon.types, rival.types));
+      await new Promise(resolve => setTimeout(resolve, 800));
+      this.showMultiplier.set(true);
       await new Promise(resolve => setTimeout(resolve, 1500));
+
       await this.gameService.resolveBattle(pokemon);
       this.animatingIndex.set(null);
       this.revealRivalStat.set(false);
+      this.showMultiplier.set(false);
     }
   }
 
+  getMultiplierText() {
+    const m = this.currentMultiplier();
+    if (m >= 4) return '¡VENTAJA x4! (+30%)';
+    if (m >= 2) return '¡VENTAJA x2! (+15%)';
+    if (m === 0) return '¡INMUNE! (-100%)';
+    if (m <= 0.25) return '¡DESVENTAJA x4! (-30%)';
+    if (m <= 0.5) return '¡DESVENTAJA x2! (-15%)';
+    return '';
+  }
+
+
+  currentMultiplierWithBonus = computed(() => {
+    const m = this.currentMultiplier();
+    if (m >= 4) return 1.30;
+    if (m >= 2) return 1.15;
+    if (m === 0) return 0;
+    if (m <= 0.25) return 0.70;
+    if (m <= 0.5) return 0.85;
+    return 1;
+  });
 
   Chetos() {
     this.gameService.totalVictories.set(40);

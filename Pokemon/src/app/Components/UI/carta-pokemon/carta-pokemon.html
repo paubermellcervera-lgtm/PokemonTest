@@ -13,7 +13,15 @@
     
     <div class="pokemon-info">
       <h3>{{ p.name | titlecase }}</h3>
-    
+      
+      <div class="types-container">
+        @for (type of p.types; track type) {
+          <div class="type-badge" [style.background-color]="getTypeColor(type)">
+            <img [src]="getTypeIcon(type)" [alt]="type" class="type-icon">
+            <span class="type-name">{{ type | titlecase }}</span>
+          </div>
+        }
+      </div>
 
       <ul class="stats-list">
         @if (hideStats() && !revealed()) {
