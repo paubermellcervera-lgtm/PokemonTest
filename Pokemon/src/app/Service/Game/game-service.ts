@@ -1,6 +1,7 @@
 import { Injectable, computed, inject, signal, effect } from '@angular/core';
 import { Router } from '@angular/router';
 import { Pokemon, ALL_STATS } from '../../Model/Pokemon';
+import { Item } from '../../Model/Item';
 import { PokemonService } from '../Pokemon/pokemon-service';
 import { StorageService } from '../storage-service';
 import { getMaxTypeEffectiveness } from '../../Utils/type-effectiveness';
@@ -38,7 +39,9 @@ export class GameService {
         // Persistencia Liga
         isLeaguePhase: this.isLeaguePhase(),
         leagueWins: this.leagueWins(),
-        opponentTeam: this.opponentTeam()
+        opponentTeam: this.opponentTeam(),
+        // Persistencia Objetos
+        items: this.items()
       };
       this.storageService.saveGameState(state);
     });
@@ -62,6 +65,9 @@ export class GameService {
       this.isLeaguePhase.set(savedState.isLeaguePhase || false);
       this.leagueWins.set(savedState.leagueWins || 0);
       this.opponentTeam.set(savedState.opponentTeam || [null, null, null]);
+
+      // Cargar Objetos
+      this.items.set(savedState.items || []);
     }
   }
 
@@ -80,6 +86,10 @@ export class GameService {
 
   readonly isEvolving = signal<boolean>(false);
   readonly evolvedTeamPreview = signal<Pokemon[]>([]);
+
+  // Signals Objetos
+  readonly items = signal<Item[]>([]);
+  readonly selectedItemForBattle = signal<Item | null>(null);
 
   // Signals Liga
   readonly isLeaguePhase = signal<boolean>(false);
@@ -119,6 +129,10 @@ export class GameService {
     this.isLeaguePhase.set(false);
     this.leagueWins.set(0);
     this.opponentTeam.set([null, null, null]);
+
+    // Generar Objetos
+    const newItems = await this.pokemonService.getRandomItems(3);
+    this.items.set(newItems);
 
     this.storageService.clearGameState();
   }
@@ -198,10 +212,23 @@ export class GameService {
     this.selectedStatId.set(ALL_STATS[randomIndex].id);
   }
 
+  useItem(item: Item) {
+    if (item.used) return;
+    this.selectedItemForBattle.set(item);
+  }
+
   async resolveBattle(playerPokemon: Pokemon): Promise<boolean> {
     const rival = this.opponent();
     const statId = this.selectedStatId();
     if (!rival || !statId) return false;
+
+    // Efecto Instant Win (Master Ball)
+    const item = this.selectedItemForBattle();
+    if (item?.effect === 'instant-win') {
+      this.consumeItem(item.id);
+      await this.winBattle();
+      return true;
+    }
 
     const playerStatValue = playerPokemon.stats.find(s => s.name === statId)?.value || 0;
     const rivalStatValue = rival.stats.find(s => s.name === statId)?.value || 0;
@@ -216,12 +243,41 @@ export class GameService {
     else if (multiplier <= 0.25) bonus = 0.70; // Desventaja x4
     else if (multiplier <= 0.5) bonus = 0.85; // Desventaja x2
 
-    const effectivePlayerStat = playerStatValue * bonus;
+    // Aplicar efectos de objeto
+    let itemMultiplier = 1;
+    if (item) {
+      if (item.effect === 'stat-boost-50') itemMultiplier = 1.5;
+      if (item.effect === 'stat-boost-100') itemMultiplier = 2.0;
+      if (item.effect === 'tier-boost') itemMultiplier = 1.4; // Simula Tier 3
+      if (item.effect === 'opponent-nerf') itemMultiplier = 1.0; // Se aplica al rival más abajo
+    }
 
-    if (effectivePlayerStat >= rivalStatValue) {
+    let effectiveRivalStat = rivalStatValue;
+    if (item?.effect === 'opponent-nerf') effectiveRivalStat *= 0.7;
+
+    const effectivePlayerStat = playerStatValue * bonus * itemMultiplier;
+
+    // Tie Breaker
+    const winsMatch = (item?.effect === 'tie-breaker') 
+      ? effectivePlayerStat >= (effectiveRivalStat * 0.9) 
+      : effectivePlayerStat >= effectiveRivalStat;
+
+    if (winsMatch) {
+      if (item?.effect === 'capture') {
+        const slotIndex = this.team().findIndex(p => p?.id === playerPokemon.id);
+        this.captureOpponent(slotIndex);
+      }
+      if (item) this.consumeItem(item.id);
       await this.winBattle();
       return true;
     } else {
+      // Efecto Shield
+      if (item && item.effect === 'shield') {
+        this.consumeItem(item.id);
+        return false; 
+      }
+
+      if (item) this.consumeItem(item.id);
       this.updatePokemonStatus(playerPokemon.id, true);
       if (!this.isGameOver()) {
         await this.spawnOpponent();
@@ -231,8 +287,11 @@ export class GameService {
   }
 
   async winBattle() {
-    this.victories.update(v => v + 1);
-    this.totalVictories.update(v => v + 1);
+    const item = this.selectedItemForBattle();
+    const winIncrement = (item?.effect === 'double-win') ? 2 : 1;
+    
+    this.victories.update(v => v + winIncrement);
+    this.totalVictories.update(v => v + winIncrement);
     this.storageService.saveHighScore(this.totalVictories());
     
     if (this.totalVictories() >= 40) {
@@ -242,8 +301,6 @@ export class GameService {
       this.router.navigate(['/cambio']);
     }
   }
-
-  // --- LIGA POKEMON ---
 
   async startLeague() {
     this.isLeaguePhase.set(true);
@@ -271,12 +328,23 @@ export class GameService {
     this.generateRandomStat();
   }
 
+  // --- LIGA POKEMON ---
+
   async resolveLeagueBattle(playerIndex: number, opponentIndex: number) {
     const myMon = this.team()[playerIndex];
     const enemyMon = this.opponentTeam()[opponentIndex];
     const statId = this.selectedStatId();
 
     if (!myMon || !enemyMon || myMon.isFainted || enemyMon.isFainted) return;
+
+    // Efecto Instant Win
+    const item = this.selectedItemForBattle();
+    if (item?.effect === 'instant-win') {
+      this.consumeItem(item.id);
+      this.updateOpponentStatus(opponentIndex, true);
+      this.checkLeagueRoundEnd();
+      return;
+    }
 
     const myVal = myMon.stats.find(s => s.name === statId)?.value || 0;
     const enemyVal = enemyMon.stats.find(s => s.name === statId)?.value || 0;
@@ -291,30 +359,85 @@ export class GameService {
     else if (multiplier <= 0.25) bonus = 0.70; // Desventaja x4
     else if (multiplier <= 0.5) bonus = 0.85; // Desventaja x2
 
-    const effectiveMyVal = myVal * bonus;
+    // Aplicar efectos de objeto
+    let itemMultiplier = 1;
+    if (item) {
+      if (item.effect === 'stat-boost-50') itemMultiplier = 1.5;
+      if (item.effect === 'stat-boost-100') itemMultiplier = 2.0;
+      if (item.effect === 'tier-boost') itemMultiplier = 1.4;
+    }
 
-    if (effectiveMyVal >= enemyVal) {
-      // Gana jugador
+    let effectiveEnemyVal = enemyVal;
+    if (item?.effect === 'opponent-nerf') effectiveEnemyVal *= 0.7;
+
+    const effectiveMyVal = myVal * bonus * itemMultiplier;
+
+    const winsMatch = (item?.effect === 'tie-breaker') 
+      ? effectiveMyVal >= (effectiveEnemyVal * 0.9) 
+      : effectiveMyVal >= effectiveEnemyVal;
+
+    if (winsMatch) {
+      if (item?.effect === 'capture') {
+        this.captureOpponent(playerIndex);
+      }
+      if (item?.effect === 'double-win') {
+        // Debilitar a otro rival aleatorio que no esté ya debilitado
+        const others = this.opponentTeam().map((p, i) => ({p, i}))
+          .filter(x => x.i !== opponentIndex && x.p && !x.p.isFainted);
+        if (others.length > 0) {
+          const target = others[Math.floor(Math.random() * others.length)];
+          this.updateOpponentStatus(target.i, true);
+        }
+      }
+      if (item) this.consumeItem(item.id);
       this.updateOpponentStatus(opponentIndex, true);
     } else {
-      // Gana rival
+      if (item && item.effect === 'shield') {
+        this.consumeItem(item.id);
+        return; 
+      }
+      
+      if (item) this.consumeItem(item.id);
       this.updatePokemonStatus(myMon.id, true);
     }
 
-    // Verificar si la ronda ha terminado
+    this.checkLeagueRoundEnd();
+  }
+
+  private checkLeagueRoundEnd() {
     const enemyWiped = this.opponentTeam().every(p => p === null || p.isFainted);
     
     if (enemyWiped) {
       this.leagueWins.update(w => w + 1);
       if (this.leagueWins() < 4) {
-        await this.spawnLeagueOpponents();
+        this.spawnLeagueOpponents();
       }
     } else {
       this.generateRandomStat();
     }
   }
 
+  captureOpponent(index: number) {
+    const rival = this.opponent() || this.opponentTeam().find(p => !p?.isFainted);
+    if (rival) {
+      this.team.update(t => {
+        const newTeam = [...t];
+        newTeam[index] = { ...rival, isFainted: false };
+        return newTeam;
+      });
+    }
+  }
+
+  reviveAllPokemon() {
+    this.team.update(t => t.map(p => p ? { ...p, isFainted: false } : null));
+    const currentItem = this.selectedItemForBattle();
+    if (currentItem && currentItem.effect === 'revive-all') {
+      this.consumeItem(currentItem.id);
+    }
+  }
+
   updateOpponentStatus(index: number, isFainted: boolean) {
+// ...
     this.opponentTeam.update(t => {
       const newTeam = [...t];
       if (newTeam[index]) {
@@ -383,5 +506,24 @@ export class GameService {
 
   updatePokemonStatus(id: number, isFainted: boolean) {
     this.team.update(t => t.map(p => p && p.id === id ? { ...p, isFainted } : p));
+  }
+
+  consumeItem(id: number) {
+    this.items.update(items => items.map(it => it.id === id ? { ...it, used: true } : it));
+    this.selectedItemForBattle.set(null);
+  }
+
+  revivePokemon(index: number) {
+    this.team.update(t => {
+      const newTeam = [...t];
+      if (newTeam[index]) {
+        newTeam[index] = { ...newTeam[index]!, isFainted: false };
+      }
+      return newTeam;
+    });
+    const currentItem = this.selectedItemForBattle();
+    if (currentItem && currentItem.effect === 'revive-one') {
+      this.consumeItem(currentItem.id);
+    }
   }
 }

@@ -3,6 +3,7 @@ import { RouterLink, Router } from '@angular/router';
 import { GameService } from '../../../Service/Game/game-service';
 import { CartaPokemon } from '../../UI/carta-pokemon/carta-pokemon';
 import { getMaxTypeEffectiveness } from '../../../Utils/type-effectiveness';
+import { Item } from '../../../Model/Item';
 
 @Component({
   selector: 'app-tablero',
@@ -20,6 +21,10 @@ export class Tablero {
   revealRivalStat = signal<boolean>(false);
   showMultiplier = signal<boolean>(false);
   currentMultiplier = signal<number>(1);
+
+  // Estados de Objetos
+  animatingItem = signal<Item | null>(null);
+  isReviveMode = signal<boolean>(false);
 
   // Estado de selección en Liga
   selectedRivalIndex = signal<number | null>(null);
@@ -68,6 +73,43 @@ export class Tablero {
 
   async confirmarEquipo() {
     await this.gameService.confirmTeam();
+  }
+
+  async activarObjeto(item: Item) {
+    if (item.used || this.animatingItem() || this.animatingIndex() !== null) return;
+    
+    // Si ya está seleccionado, lo desactivamos
+    if (this.gameService.selectedItemForBattle()?.id === item.id) {
+      this.gameService.selectedItemForBattle.set(null);
+      if (item.effect === 'revive-one') {
+        this.isReviveMode.set(false);
+      }
+      return;
+    }
+
+    // Efectos inmediatos (Revivir) no se "activan" para el combate, se ejecutan
+    if (item.effect === 'revive-all') {
+      this.animatingItem.set(item);
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      this.animatingItem.set(null);
+      this.gameService.reviveAllPokemon();
+      return;
+    }
+
+    if (item.effect === 'revive-one') {
+      this.animatingItem.set(item);
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      this.animatingItem.set(null);
+      this.isReviveMode.set(true);
+      this.gameService.useItem(item);
+      return;
+    }
+
+    // Objetos de combate: Animación y activación
+    this.animatingItem.set(item);
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    this.animatingItem.set(null);
+    this.gameService.useItem(item);
   }
 
   async volverAlMenu() {
@@ -121,7 +163,18 @@ export class Tablero {
 
   async seleccionarParaBatalla(index: number) {
     const pokemon = this.miEquipo[index];
-    if (!pokemon || pokemon.isFainted || this.esFaseSeleccion || this.animatingIndex() !== null) return;
+    if (!pokemon || this.esFaseSeleccion || this.animatingIndex() !== null) return;
+
+    // Manejar Revivir
+    if (this.isReviveMode()) {
+      if (pokemon.isFainted) {
+        this.gameService.revivePokemon(index);
+        this.isReviveMode.set(false);
+      }
+      return;
+    }
+
+    if (pokemon.isFainted) return;
 
     if (this.esLiga) {
       const rivalIndex = this.selectedRivalIndex();
@@ -179,15 +232,68 @@ export class Tablero {
     return '';
   }
 
+  hasBoost(item: Item | null): boolean {
+    return !!item;
+  }
+
+  getBoostType(item: Item | null): string {
+    if (!item) return '';
+    const effect = item.effect;
+    switch (effect) {
+      case 'instant-win': return 'boost-win';
+      case 'capture': return 'boost-capture';
+      case 'stat-boost-50': return 'boost-med';
+      case 'stat-boost-100': return 'boost-high';
+      case 'shield': return 'boost-shield';
+      case 'revive-all': return 'boost-revive-all';
+      case 'tier-boost': return 'boost-tier';
+      case 'tie-breaker': return 'boost-priority';
+      case 'revive-one': return 'boost-revive';
+      case 'double-win': return 'boost-double';
+      default: return '';
+    }
+  }
+
+  getBoostText(item: Item | null): string {
+    if (!item) return '';
+    const effect = item.effect;
+    switch (effect) {
+      case 'instant-win': return 'VICTORIA';
+      case 'capture': return 'CAPTURAR';
+      case 'stat-boost-50': return '+50% EST.';
+      case 'stat-boost-100': return '+100% EST.';
+      case 'shield': return 'ESCUDO';
+      case 'revive-all': return 'EQUIPO';
+      case 'tier-boost': return 'TIER MAX';
+      case 'tie-breaker': return 'PRIORIDAD';
+      case 'revive-one': return 'REVIVIR';
+      case 'double-win': return 'x2 VICTORIA';
+      default: return '';
+    }
+  }
+
 
   currentMultiplierWithBonus = computed(() => {
     const m = this.currentMultiplier();
-    if (m >= 4) return 1.30;
-    if (m >= 2) return 1.15;
-    if (m === 0) return 0;
-    if (m <= 0.25) return 0.70;
-    if (m <= 0.5) return 0.85;
-    return 1;
+    let bonus = 1;
+    if (m >= 4) bonus = 1.30;
+    else if (m >= 2) bonus = 1.15;
+    else if (m === 0) bonus = 0;
+    else if (m <= 0.25) bonus = 0.70;
+    else if (m <= 0.5) bonus = 0.85;
+
+    // Incluir bonus de objeto
+    const item = this.gameService.selectedItemForBattle();
+    if (item) {
+      if (item.effect === 'stat-boost-50') bonus *= 1.5;
+      if (item.effect === 'stat-boost-100') bonus *= 2.0;
+      if (item.effect === 'tier-boost') bonus *= 1.4;
+      if (item.effect === 'opponent-nerf') bonus *= 1.43;
+      if (item.effect === 'tie-breaker') bonus *= 1.11; // Refleja el margen del 10%
+      if (item.effect === 'instant-win') bonus = 999; 
+    }
+
+    return bonus;
   });
 
   Chetos() {

@@ -23,6 +23,45 @@
     }
   </div>
 
+  <!-- ZONA DE OBJETOS -->
+  @if (!esFaseSeleccion && !gameService.isGameOver() && !gameService.isLeagueVictory() && !gameService.isEvolving()) {
+    <div class="items-inventory-container">
+      <div class="items-inventory">
+        @for (item of gameService.items(); track item.id) {
+          <div class="item-slot" 
+               [class.used]="item.used" 
+               [class.active]="gameService.selectedItemForBattle()?.id === item.id"
+               (click)="activarObjeto(item)">
+            <div class="item-icon-container">
+              <img [src]="item.image" [alt]="item.name" class="item-img">
+            </div>
+            <span class="item-name">{{ item.name }}</span>
+            @if (gameService.selectedItemForBattle()?.id === item.id) {
+              <div class="item-active-badge">ACTIVO</div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- OVERLAY DE ANIMACIÓN DE OBJETO -->
+  @if (animatingItem()) {
+    <div class="item-animation-overlay" [class.boost-active]="hasBoost(animatingItem())">
+      <div class="big-item-container">
+        <img [src]="animatingItem()?.image" class="big-item-img">
+        <div class="item-use-text">¡{{ animatingItem()?.name }}!</div>
+        <div class="item-use-desc">{{ animatingItem()?.description }}</div>
+        
+        @if (getBoostType(animatingItem())) {
+          <div class="stat-boost-indicator" [class]="getBoostType(animatingItem())">
+            {{ getBoostText(animatingItem()) }}
+          </div>
+        }
+      </div>
+    </div>
+  }
+
   <div class="battle-area" [class.animating]="animatingIndex() !== null">
     <div class="opponent-side" [class.combat-focus]="animatingIndex() !== null">
       <h3>{{ esLiga ? 'Alto Mando' : 'Oponente' }}</h3>
@@ -80,6 +119,9 @@
                 {{ getMultiplierText() }}
               </div>
             }
+            @if (isReviveMode()) {
+              <div class="revive-prompt">Selecciona un Pokémon debilitado para reanimarlo</div>
+            }
           }
         </div>
       } @else {
@@ -116,7 +158,7 @@
                 [isLoading]="gameService.loadingSlots()[slot]"
                 [showOnlyStatId]="esFaseSeleccion ? null : estadisticaSeleccionada"
                 (click)="seleccionarParaBatalla(slot)"
-                [class.selectable]="!esFaseSeleccion && miEquipo[slot] && !miEquipo[slot]!.isFainted && (!esLiga || selectedRivalIndex() !== null)"
+                [class.selectable]="(!esFaseSeleccion && miEquipo[slot] && !miEquipo[slot]!.isFainted && (!esLiga || selectedRivalIndex() !== null)) || (isReviveMode() && miEquipo[slot]?.isFainted)"
                 [class.fainted]="miEquipo[slot]?.isFainted"
                 [revealed]="animatingIndex() === slot"
                 [multiplier]="animatingIndex() === slot && showMultiplier() ? currentMultiplierWithBonus() : 1"
@@ -157,4 +199,4 @@
     </div>
   }
 </div>
-<button (click)="Chetos()" class="btn-success">Chetos</button>
+<button (click)="Chetos()" class="btn-success">Chetos</button>
