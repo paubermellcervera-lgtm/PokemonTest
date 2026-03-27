@@ -51,6 +51,27 @@
   font-size: 1.5rem;
 }
 
+.types-container {
+  gap: 0.15rem !important;
+  margin-bottom: 0.2rem !important;
+  flex-wrap: wrap;
+}
+
+.type-badge {
+  padding: 0.1rem 0.3rem !important;
+  gap: 0.15rem !important;
+  border-radius: 0.5rem !important;
+}
+
+.type-icon {
+  width: 0.6rem !important;
+  height: 0.6rem !important;
+}
+
+.type-name {
+  font-size: 0.45rem !important;
+}
+
 .spinner {
   width: 1.5rem;
   height: 1.5rem;

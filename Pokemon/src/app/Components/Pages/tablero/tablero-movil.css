@@ -80,3 +80,30 @@
   width: 3.5rem;
   height: 3.5rem;
 }
+
+/* OBJETOS MOVIL */
+.items-inventory {
+  gap: 0.5rem !important;
+  padding: 0.3rem 0.8rem !important;
+  border-radius: 1.5rem !important;
+}
+
+.item-icon-container {
+  width: 2.2rem !important;
+  height: 2.2rem !important;
+}
+
+.item-img {
+  width: 1.6rem !important;
+  height: 1.6rem !important;
+}
+
+.item-name {
+  font-size: 0.5rem !important;
+  letter-spacing: 0 !important;
+}
+
+.item-active-badge {
+  font-size: 0.5rem !important;
+  padding: 0.1rem 0.3rem !important;
+}
