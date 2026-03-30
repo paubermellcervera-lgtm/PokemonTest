@@ -4,12 +4,12 @@ export interface Stat {
 }
 
 export const ALL_STATS = [
-  { id: 'hp', name: 'HP' },
-  { id: 'attack', name: 'Ataque' },
-  { id: 'defense', name: 'Defensa' },
-  { id: 'special-attack', name: 'At. Especial' },
-  { id: 'special-defense', name: 'Def. Especial' },
-  { id: 'speed', name: 'Velocidad' }
+  { id: 'hp', name: 'HP', shorthand: 'PS' },
+  { id: 'attack', name: 'Ataque', shorthand: 'Atq' },
+  { id: 'defense', name: 'Defensa', shorthand: 'Def' },
+  { id: 'special-attack', name: 'At. Especial', shorthand: 'At.Esp' },
+  { id: 'special-defense', name: 'Def. Especial', shorthand: 'Def.Esp' },
+  { id: 'speed', name: 'Velocidad', shorthand: 'Vel' }
 ];
 
 export interface Pokemon {

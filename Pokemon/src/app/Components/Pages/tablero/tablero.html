@@ -38,6 +38,11 @@
             <span class="item-name">{{ item.name }}</span>
             @if (gameService.selectedItemForBattle()?.id === item.id) {
               <div class="item-active-badge">ACTIVO</div>
+              @if (esObjetoInmediato(item)) {
+                <button class="btn-use-now" (click)="usarObjetoDirecto($event, item)">
+                  ¡USAR AHORA!
+                </button>
+              }
             }
           </div>
         }
@@ -199,4 +204,4 @@
     </div>
   }
 </div>
-<button (click)="Chetos()" class="btn-success">Chetos</button>
+<button (click)="Chetos()" class="btn-success">Chetos</button>

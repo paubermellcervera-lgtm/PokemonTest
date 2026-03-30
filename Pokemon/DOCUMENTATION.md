@@ -57,7 +57,7 @@ Gestiona la comunicación asíncrona con la PokeAPI.
 
 ---
 
-### 3. StorageService (`storage-service.ts`)
+### 4. StorageService (`storage-service.ts`)
 Maneja la persistencia local para evitar la pérdida de progreso al recargar.
 
 #### **Métodos Detallados**
@@ -65,6 +65,35 @@ Maneja la persistencia local para evitar la pérdida de progreso al recargar.
 - `saveGameState(state)`: Guarda un objeto JSON con todos los signals relevantes del `GameService` en `pokemon_game_state`.
 - `getGameState()`: Recupera y parsea el estado guardado.
 - `clearGameState()`: Elimina los datos de la partida actual (usado al perder o ganar).
+
+---
+
+## 🎒 Sistema de Objetos (Items)
+
+El juego cuenta con un sistema de inventario que permite al jugador utilizar objetos estratégicos para cambiar el rumbo de los combates.
+
+### **1. Obtención de Objetos**
+Al inicio de cada partida (`initGame`), el `PokemonService` consulta la PokeAPI para obtener **3 objetos aleatorios**. Estos objetos se mapean internamente a efectos específicos definidos en `Item.ts`.
+
+### **2. Ciclo de Vida de un Objeto**
+- **Carga:** Se almacenan en el Signal `items` y se persisten en `LocalStorage`.
+- **Selección:** El jugador elige un objeto en el `Tablero`. Este se marca como `selectedItemForBattle`.
+- **Uso:** El efecto se activa durante la resolución del combate (`resolveBattle` o `resolveLeagueBattle`).
+- **Consumo:** Tras aplicarse el efecto, el objeto se marca como `used: true` mediante `consumeItem()`, quedando inhabilitado para el resto de la partida.
+
+### **3. Tipos de Efectos Disponibles**
+
+| Efecto | Descripción Técnica |
+| :--- | :--- |
+| **Instant Win** (Master Ball) | Salta la comparación de stats y otorga la victoria inmediata. |
+| **Stat Boost (50%/100%)** | Multiplica el stat del jugador por 1.5 o 2.0 respectivamente. |
+| **Opponent Nerf** | Reduce el stat del rival en un 30% (multiplicador 0.7). |
+| **Shield** | Si el jugador pierde, el Pokémon **no se debilita** y el combate se repite con un nuevo rival. |
+| **Capture** | Si el jugador gana, el Pokémon rival se une al equipo reemplazando al actual. |
+| **Double Win** | Otorga 2 victorias en lugar de 1. En la Liga, derrota a un rival adicional al azar. |
+| **Tie Breaker** | Otorga la victoria si el stat del jugador es al menos el 90% del stat del rival. |
+| **Tier Boost** | Simula que el Pokémon es de Tier 3 (multiplicador 1.4) solo para ese combate. |
+| **Revive (One/All)** | Restaura el estado `isFainted: false` de uno o todos los Pokémon del equipo. |
 
 ---
 

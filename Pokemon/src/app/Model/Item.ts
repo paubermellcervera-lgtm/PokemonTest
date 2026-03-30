@@ -6,7 +6,7 @@ export type ItemEffect =
   | 'shield' 
   | 'revive-all' 
   | 'tier-boost' 
-  | 'tie-breaker' 
+  | 'opponent-reroll' 
   | 'opponent-nerf' 
   | 'revive-one'
   | 'double-win';
@@ -22,13 +22,13 @@ export interface Item {
 
 export const ITEM_EFFECTS: Record<ItemEffect, string> = {
   'instant-win': 'Gana el combate automáticamente (Efecto Master Ball).',
-  'capture': 'Captura al rival y lo une a tu equipo reemplazando al actual.',
+  'capture': 'Captura al oponente actual inmediatamente y te obliga a cambiarlo por uno de tu equipo.',
   'stat-boost-50': '+50% a la estadística de combate actual.',
   'stat-boost-100': '+100% a la estadística de combate actual.',
   'shield': 'Protege de la derrota: Si pierdes, el Pokémon no se debilita.',
   'revive-all': 'Revive a TODOS los Pokémon debilitados del equipo.',
-  'tier-boost': 'Aumenta el Tier del Pokémon a 3 para este combate.',
-  'tie-breaker': 'Gana automáticamente en caso de empate.',
+  'tier-boost': 'Tu equipo evoluciona al Tier 3 temporalmente para este combate.',
+  'opponent-reroll': 'Cambia al oponente actual por otro aleatorio (No funciona en la Liga).',
   'opponent-nerf': 'Reduce la estadística del rival en un 30%.',
   'revive-one': 'Revive a un Pokémon seleccionado del equipo.',
   'double-win': 'Consigue 2 victorias en lugar de 1 al ganar el combate.'

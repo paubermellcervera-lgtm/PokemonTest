@@ -87,29 +87,46 @@ export class Tablero {
       return;
     }
 
-    // Efectos inmediatos (Revivir) no se "activan" para el combate, se ejecutan
+    // Reproducir SIEMPRE la animación informativa al seleccionar
+    await this.ejecutarAnimacionObjeto(item);
+
+    // Efectos que NO son de combate (Revivir) se ejecutan tras la animación
     if (item.effect === 'revive-all') {
-      this.animatingItem.set(item);
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      this.animatingItem.set(null);
       this.gameService.reviveAllPokemon();
       return;
     }
 
     if (item.effect === 'revive-one') {
-      this.animatingItem.set(item);
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      this.animatingItem.set(null);
       this.isReviveMode.set(true);
-      this.gameService.useItem(item);
-      return;
     }
 
-    // Objetos de combate: Animación y activación
+    // Marcar como seleccionado para el combate
+    this.gameService.useItem(item);
+  }
+
+  async usarObjetoDirecto(event: Event, item: Item) {
+    event.stopPropagation();
+    if (item.used || this.animatingIndex() !== null) return;
+
+    if (item.effect === 'instant-win') {
+      await this.gameService.applyInstantWin();
+    } else if (item.effect === 'tier-boost') {
+      await this.gameService.applyTierBoost();
+    } else if (item.effect === 'opponent-reroll') {
+      await this.gameService.rerollOpponent();
+    } else if (item.effect === 'capture') {
+      await this.gameService.applyForceCapture();
+    }
+  }
+
+  private async ejecutarAnimacionObjeto(item: Item) {
     this.animatingItem.set(item);
     await new Promise(resolve => setTimeout(resolve, 3000));
     this.animatingItem.set(null);
-    this.gameService.useItem(item);
+  }
+
+  esObjetoInmediato(item: Item): boolean {
+    return ['instant-win', 'tier-boost', 'opponent-reroll', 'capture'].includes(item.effect);
   }
 
   async volverAlMenu() {
@@ -118,7 +135,7 @@ export class Tablero {
   }
 
   get pokemonRival() {
-    return this.gameService.opponent();
+    return this.gameService.effectiveOpponent();
   }
 
   get rivalesLiga() {
@@ -126,7 +143,7 @@ export class Tablero {
   }
 
   get miEquipo() {
-    return this.gameService.team();
+    return this.gameService.effectiveTeam();
   }
 
   get equipoEvolucionado() {
@@ -215,7 +232,7 @@ export class Tablero {
       this.showMultiplier.set(true);
       await new Promise(resolve => setTimeout(resolve, 1500));
 
-      await this.gameService.resolveBattle(pokemon);
+      await this.gameService.resolveBattle(index);
       this.animatingIndex.set(null);
       this.revealRivalStat.set(false);
       this.showMultiplier.set(false);
@@ -247,7 +264,7 @@ export class Tablero {
       case 'shield': return 'boost-shield';
       case 'revive-all': return 'boost-revive-all';
       case 'tier-boost': return 'boost-tier';
-      case 'tie-breaker': return 'boost-priority';
+      case 'opponent-reroll': return 'boost-priority';
       case 'revive-one': return 'boost-revive';
       case 'double-win': return 'boost-double';
       default: return '';
@@ -265,7 +282,7 @@ export class Tablero {
       case 'shield': return 'ESCUDO';
       case 'revive-all': return 'EQUIPO';
       case 'tier-boost': return 'TIER MAX';
-      case 'tie-breaker': return 'PRIORIDAD';
+      case 'opponent-reroll': return 'REROLL';
       case 'revive-one': return 'REVIVIR';
       case 'double-win': return 'x2 VICTORIA';
       default: return '';
@@ -289,7 +306,6 @@ export class Tablero {
       if (item.effect === 'stat-boost-100') bonus *= 2.0;
       if (item.effect === 'tier-boost') bonus *= 1.4;
       if (item.effect === 'opponent-nerf') bonus *= 1.43;
-      if (item.effect === 'tie-breaker') bonus *= 1.11; // Refleja el margen del 10%
       if (item.effect === 'instant-win') bonus = 999; 
     }
 
@@ -301,4 +317,3 @@ export class Tablero {
   }
 
 }
-

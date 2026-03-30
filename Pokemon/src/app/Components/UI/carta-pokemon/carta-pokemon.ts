@@ -1,6 +1,6 @@
 import { Component, input, signal, effect } from '@angular/core';
 import { TitleCasePipe } from '@angular/common';
-import { Pokemon } from '../../../Model/Pokemon';
+import { Pokemon, ALL_STATS } from '../../../Model/Pokemon';
 import { getTypeIconUrl, TYPE_COLORS } from '../../../Utils/type-effectiveness';
 
 @Component({
@@ -95,5 +95,10 @@ export class CartaPokemon {
       return p.stats.filter(s => s.name === this.showOnlyStatId());
     }
     return p.stats;
+  }
+
+  getStatShorthand(statName: string): string {
+    const stat = ALL_STATS.find(s => s.id === statName || s.name === statName);
+    return stat ? (stat as any).shorthand : statName;
   }
 }

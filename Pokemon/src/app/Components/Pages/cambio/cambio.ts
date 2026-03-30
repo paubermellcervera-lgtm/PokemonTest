@@ -10,7 +10,7 @@ import { CartaPokemon } from '../../UI/carta-pokemon/carta-pokemon';
   styleUrl: './cambio.css',
 })
 export class Cambio {
-  readonly gameService = inject(GameService);
+  readonly gameService: GameService = inject(GameService);
 
   get pokemonDerrotado() {
     return this.gameService.defeatedOpponent();
@@ -18,6 +18,10 @@ export class Cambio {
 
   get miEquipo() {
     return this.gameService.team();
+  }
+
+  get isForcedCapture() {
+    return this.gameService.isForcedCapture();
   }
 
   async reemplazar(index: number) {

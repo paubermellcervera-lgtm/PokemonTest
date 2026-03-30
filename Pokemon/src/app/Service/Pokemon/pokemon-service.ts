@@ -109,7 +109,7 @@ export class PokemonService {
       207: 'shield',      // Focus Band
       29: 'revive-all',   // Max Revive
       50: 'tier-boost',   // Rare Candy
-      190: 'tie-breaker',  // Quick Claw
+      70: 'opponent-reroll', // Escape Rope
       28: 'revive-one',    // Revive
       153: 'double-win'    // Amulet Coin
     };

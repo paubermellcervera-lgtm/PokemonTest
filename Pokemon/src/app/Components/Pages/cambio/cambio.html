@@ -1,8 +1,13 @@
 <div class="cambio-container">
   
   <div class="header">
-    <h1>¡Has ganado el combate!</h1>
-    <p>¿Quieres capturar a {{ pokemonDerrotado?.name | titlecase }} para tu equipo?</p>
+    @if (isForcedCapture) {
+      <h1 class="forced-title">¡ULTRA BALL ACTIVADA!</h1>
+      <p>Debes elegir un Pokémon de tu equipo para sustituirlo por {{ pokemonDerrotado?.name | titlecase }}</p>
+    } @else {
+      <h1>¡Has ganado el combate!</h1>
+      <p>¿Quieres capturar a {{ pokemonDerrotado?.name | titlecase }} para tu equipo?</p>
+    }
   </div>
 
   <div class="exchange-area">
@@ -43,9 +48,11 @@
   </div>
 
   <div class="actions">
-    <button (click)="noCambiar()" class="btn-danger">
-      Cancelar Intercambio
-    </button>
+    @if (!isForcedCapture) {
+      <button (click)="noCambiar()" class="btn-danger">
+        Cancelar Intercambio
+      </button>
+    }
   </div>
 
 </div>

@@ -2,24 +2,27 @@
 
 .card-container {
   height: auto !important;
-  min-height: clamp(6rem, 18vh, 10rem) !important;
-  padding: 0.15rem !important;
-  border-width: 0.1rem !important;
+  min-height: clamp(10rem, 30vh, 18rem) !important;
+  padding: 0.3rem !important;
+  border-width: 0.15rem !important;
   overflow: visible !important;
 }
 
 .pokemon-image img {
   width: 100%;
   height: 100%;
-  max-width: clamp(4.5rem, 30vw, 8rem);
-  max-height: clamp(4.5rem, 30vw, 8rem);
+  max-width: clamp(8.5rem, 45vw, 14rem);
+  max-height: clamp(8.5rem, 45vw, 14rem);
   object-fit: contain;
 }
 
 .pokemon-info h3 {
-  font-size: clamp(0.6rem, 2.5vw, 0.75rem) !important;
-  margin: 0.2rem 0 !important;
-  word-break: break-word;
+  font-size: clamp(0.65rem, 3vw, 0.9rem) !important;
+  margin: 0.25rem 0 !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .tier-badge {
