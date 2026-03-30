@@ -106,12 +106,11 @@ export class PokemonService {
       2: 'capture',       // Ultra Ball
       57: 'stat-boost-50', // X-Attack
       201: 'stat-boost-100', // Choice Band
-      207: 'shield',      // Focus Band
+      207: 'reroll-stat', // Focus Band
       29: 'revive-all',   // Max Revive
       50: 'tier-boost',   // Rare Candy
       70: 'opponent-reroll', // Escape Rope
       28: 'revive-one',    // Revive
-      153: 'double-win'    // Amulet Coin
     };
 
     const ids = Object.keys(itemPool).map(Number);

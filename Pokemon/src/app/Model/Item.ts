@@ -9,7 +9,7 @@ export type ItemEffect =
   | 'opponent-reroll' 
   | 'opponent-nerf' 
   | 'revive-one'
-  | 'double-win';
+  | 'reroll-stat';
 
 export interface Item {
   id: number;
@@ -26,10 +26,10 @@ export const ITEM_EFFECTS: Record<ItemEffect, string> = {
   'stat-boost-50': '+50% a la estadística de combate actual.',
   'stat-boost-100': '+100% a la estadística de combate actual.',
   'shield': 'Protege de la derrota: Si pierdes, el Pokémon no se debilita.',
+  'reroll-stat': 'Rerollea la estadística seleccionada para el combate.',
   'revive-all': 'Revive a TODOS los Pokémon debilitados del equipo.',
   'tier-boost': 'Tu equipo evoluciona al Tier 3 temporalmente para este combate.',
   'opponent-reroll': 'Cambia al oponente actual por otro aleatorio (No funciona en la Liga).',
   'opponent-nerf': 'Reduce la estadística del rival en un 30%.',
   'revive-one': 'Revive a un Pokémon seleccionado del equipo.',
-  'double-win': 'Consigue 2 victorias en lugar de 1 al ganar el combate.'
 };

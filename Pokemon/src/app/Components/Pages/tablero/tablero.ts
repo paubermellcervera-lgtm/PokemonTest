@@ -90,12 +90,7 @@ export class Tablero {
     // Reproducir SIEMPRE la animación informativa al seleccionar
     await this.ejecutarAnimacionObjeto(item);
 
-    // Efectos que NO son de combate (Revivir) se ejecutan tras la animación
-    if (item.effect === 'revive-all') {
-      this.gameService.reviveAllPokemon();
-      return;
-    }
-
+    
     if (item.effect === 'revive-one') {
       this.isReviveMode.set(true);
     }
@@ -116,6 +111,10 @@ export class Tablero {
       await this.gameService.rerollOpponent();
     } else if (item.effect === 'capture') {
       await this.gameService.applyForceCapture();
+    }else if (item.effect === 'revive-all') {
+      await this.gameService.reviveAllPokemon();
+    } else if (item.effect === 'reroll-stat') {
+      await this.gameService.rerollStat();
     }
   }
 
@@ -126,7 +125,7 @@ export class Tablero {
   }
 
   esObjetoInmediato(item: Item): boolean {
-    return ['instant-win', 'tier-boost', 'opponent-reroll', 'capture'].includes(item.effect);
+    return ['instant-win', 'tier-boost', 'opponent-reroll', 'capture', 'revive-all', 'reroll-stat'].includes(item.effect);
   }
 
   async volverAlMenu() {
@@ -265,8 +264,8 @@ export class Tablero {
       case 'revive-all': return 'boost-revive-all';
       case 'tier-boost': return 'boost-tier';
       case 'opponent-reroll': return 'boost-priority';
+      case 'reroll-stat': return 'boost-reroll-stat';
       case 'revive-one': return 'boost-revive';
-      case 'double-win': return 'boost-double';
       default: return '';
     }
   }
@@ -283,8 +282,8 @@ export class Tablero {
       case 'revive-all': return 'EQUIPO';
       case 'tier-boost': return 'TIER MAX';
       case 'opponent-reroll': return 'REROLL';
+      case 'reroll-stat': return 'REROLL STAT';
       case 'revive-one': return 'REVIVIR';
-      case 'double-win': return 'x2 VICTORIA';
       default: return '';
     }
   }

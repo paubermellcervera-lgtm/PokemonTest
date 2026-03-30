@@ -302,13 +302,13 @@ export class GameService {
     }
   }
 
-  async doubleWin() {
+  async rerollStat() {
     const item = this.selectedItemForBattle();
-    if (item?.effect === 'double-win') {
+    if (item?.effect === 'reroll-stat') {
       this.consumeItem(item.id);
-      await this.winBattle();
+      this.generateRandomStat();
     }
-     }
+  }
   async resolveBattle(playerIndex: number): Promise<boolean> {
     const playerPokemon = this.effectiveTeam()[playerIndex];
     const rival = this.effectiveOpponent();
@@ -317,7 +317,7 @@ export class GameService {
 
     // Solo procesamos objetos que tienen efecto real en el cálculo de combate
     const item = this.selectedItemForBattle();
-    const isCombatItem = item && !['instant-win', 'tier-boost', 'opponent-reroll', 'capture', 'revive-all', 'revive-one'].includes(item.effect);
+    const isCombatItem = item && !['instant-win', 'tier-boost', 'opponent-reroll', 'capture', 'revive-all', 'revive-one', 'reroll-stat'].includes(item.effect);
 
     const playerStatValue = playerPokemon.stats.find(s => s.name === statId)?.value || 0;
     const rivalStatValue = rival.stats.find(s => s.name === statId)?.value || 0;
@@ -381,7 +381,7 @@ export class GameService {
   async winBattle() {
     this.isTierBoostActive.set(false);
         const currentItem = this.selectedItemForBattle(); // Get item first
-       const winIncrement = (currentItem?.effect === 'double-win') ? 2 : 1; // Determine increment
+       const winIncrement = 1; // Determine increment
     
          if (currentItem) {
             this.consumeItem(currentItem.id); // Consume it after determining increment
@@ -390,7 +390,7 @@ export class GameService {
        this.totalVictories.update(v => v + winIncrement);
         this.storageService.saveHighScore(this.totalVictories());
    
-        if (this.totalVictories() >= 40) {
+        if (this.totalVictories() >= 30) {
           await this.startLeague();
         } else {
          this.defeatedOpponent.set(this.opponent());
@@ -435,7 +435,7 @@ export class GameService {
 
     // Solo procesamos objetos que tienen efecto real en el cálculo de combate
     const item = this.selectedItemForBattle();
-    const isCombatItem = item && !['instant-win', 'tier-boost', 'opponent-reroll', 'capture', 'revive-all', 'revive-one'].includes(item.effect);
+    const isCombatItem = item && !['instant-win', 'tier-boost', 'opponent-reroll', 'capture', 'revive-all', 'revive-one', 'reroll-stat'].includes(item.effect);
 
     const myVal = myMon.stats.find(s => s.name === statId)?.value || 0;
     const enemyVal = enemyMon.stats.find(s => s.name === statId)?.value || 0;
@@ -467,15 +467,7 @@ export class GameService {
       if (isCombatItem && item.effect === 'capture') {
         this.captureOpponent(playerIndex);
       }
-      if (isCombatItem && item.effect === 'double-win') {
-        // Debilitar a otro rival aleatorio
-        const others = this.opponentTeam().map((p, i) => ({p, i}))
-          .filter(x => x.i !== opponentIndex && x.p && !x.p.isFainted);
-        if (others.length > 0) {
-          const target = others[Math.floor(Math.random() * others.length)];
-          this.updateOpponentStatus(target.i, true);
-        }
-      }
+     
       if (isCombatItem) this.consumeItem(item.id);
       this.updateOpponentStatus(opponentIndex, true);
     } else {
@@ -526,7 +518,10 @@ export class GameService {
 
   reviveAllPokemon() {
     this.team.update(t => t.map(p => p ? { ...p, isFainted: false } : null));
-    const currentItem = this.selectedItemForBattle();
+
+    const currentItem = this.selectedItemForBattle() ||
+      this.items().find(i => i.effect === 'revive-all' && !i.used);
+
     if (currentItem && currentItem.effect === 'revive-all') {
       this.consumeItem(currentItem.id);
     }

@@ -18,7 +18,6 @@ Es el orquestador del estado global del juego utilizando **Angular Signals**.
 - `currentTier`: Nivel actual de evolución (1, 2 o 3).
 - `selectedStatId`: ID de la estadística elegida aleatoriamente para el combate actual.
 - `rerolls`: Array que indica cuántos cambios quedan para cada slot del equipo inicial.
-- `isRerollGlobalCooldown`: Signal booleano que impide realizar múltiples rerolls en menos de 1 segundo para evitar spam y asegurar la carga correcta de datos.
 - `isSelectionPhase`: Booleano que indica si el jugador está en la pantalla de inicio eligiendo equipo.
 - `isLeaguePhase`: Indica si el jugador ha entrado en la fase final de la Liga.
 - `leagueWins`: Contador de victorias dentro de la Liga (se requieren 4 para ganar el juego).
@@ -29,7 +28,7 @@ Es el orquestador del estado global del juego utilizando **Angular Signals**.
 - `confirmTeam()`: Valida que el equipo esté completo y cambia la fase de selección a la fase de combate, spawneando al primer oponente.
 - `spawnOpponent()`: Obtiene un Pokémon aleatorio del Tier actual (distinto a los del equipo del jugador) y selecciona una estadística aleatoria para el duelo.
 - `resolveBattle(playerPokemon)`: Compara la estadística seleccionada entre el Pokémon del jugador y el rival. Si el jugador gana, llama a `winBattle()`; si pierde, marca al Pokémon como debilitado (`isFainted`).
-- `winBattle()`: Incrementa los contadores de victorias. Si llega a 40 totales, inicia la Liga; de lo contrario, guarda al rival derrotado y navega a la pantalla de cambio.
+- `winBattle()`: Incrementa los contadores de victorias. Si llega a 30 totales, inicia la Liga; de lo contrario, guarda al rival derrotado y navega a la pantalla de cambio.
 - `applyReplacement(index)`: Si el jugador elige un slot (0-2), reemplaza al Pokémon de ese slot por el oponente derrotado (curado). Si es `null`, no hay cambio. Luego verifica si toca evolucionar.
 - `prepareEvolution()`: Calcula las evoluciones de los 3 Pokémon del equipo consultando la PokeAPI. Si un Pokémon no tiene evolución o ya fue usada, sube sus stats base al siguiente Tier.
 - `completeEvolution()`: Aplica formalmente el equipo evolucionado, incrementa el `currentTier` y reinicia las victorias del Tier.
@@ -57,7 +56,7 @@ Gestiona la comunicación asíncrona con la PokeAPI.
 
 ---
 
-### 4. StorageService (`storage-service.ts`)
+### 3. StorageService (`storage-service.ts`)
 Maneja la persistencia local para evitar la pérdida de progreso al recargar.
 
 #### **Métodos Detallados**
@@ -65,35 +64,6 @@ Maneja la persistencia local para evitar la pérdida de progreso al recargar.
 - `saveGameState(state)`: Guarda un objeto JSON con todos los signals relevantes del `GameService` en `pokemon_game_state`.
 - `getGameState()`: Recupera y parsea el estado guardado.
 - `clearGameState()`: Elimina los datos de la partida actual (usado al perder o ganar).
-
----
-
-## 🎒 Sistema de Objetos (Items)
-
-El juego cuenta con un sistema de inventario que permite al jugador utilizar objetos estratégicos para cambiar el rumbo de los combates.
-
-### **1. Obtención de Objetos**
-Al inicio de cada partida (`initGame`), el `PokemonService` consulta la PokeAPI para obtener **3 objetos aleatorios**. Estos objetos se mapean internamente a efectos específicos definidos en `Item.ts`.
-
-### **2. Ciclo de Vida de un Objeto**
-- **Carga:** Se almacenan en el Signal `items` y se persisten en `LocalStorage`.
-- **Selección:** El jugador elige un objeto en el `Tablero`. Este se marca como `selectedItemForBattle`.
-- **Uso:** El efecto se activa durante la resolución del combate (`resolveBattle` o `resolveLeagueBattle`).
-- **Consumo:** Tras aplicarse el efecto, el objeto se marca como `used: true` mediante `consumeItem()`, quedando inhabilitado para el resto de la partida.
-
-### **3. Tipos de Efectos Disponibles**
-
-| Efecto | Descripción Técnica |
-| :--- | :--- |
-| **Instant Win** (Master Ball) | Salta la comparación de stats y otorga la victoria inmediata. |
-| **Stat Boost (50%/100%)** | Multiplica el stat del jugador por 1.5 o 2.0 respectivamente. |
-| **Opponent Nerf** | Reduce el stat del rival en un 30% (multiplicador 0.7). |
-| **Shield** | Si el jugador pierde, el Pokémon **no se debilita** y el combate se repite con un nuevo rival. |
-| **Capture** | Si el jugador gana, el Pokémon rival se une al equipo reemplazando al actual. |
-| **Double Win** | Otorga 2 victorias en lugar de 1. En la Liga, derrota a un rival adicional al azar. |
-| **Tie Breaker** | Otorga la victoria si el stat del jugador es al menos el 90% del stat del rival. |
-| **Tier Boost** | Simula que el Pokémon es de Tier 3 (multiplicador 1.4) solo para ese combate. |
-| **Revive (One/All)** | Restaura el estado `isFainted: false` de uno o todos los Pokémon del equipo. |
 
 ---
 
@@ -124,6 +94,62 @@ El archivo `tablero.css` gestiona estados complejos de la interfaz:
 
 ### **4. Fondos Inmersivos**
 Se utilizan imágenes de gran formato (`.webp`) con `background-attachment: fixed` para crear un efecto de profundidad sutil al hacer scroll, manteniendo la ambientación de "Paisaje Pokémon" y "Fondo de Combate" en todo momento.
+
+---
+
+## 🧩 Modelo Item (`Item.ts`)
+
+Describe todos los efectos disponibles de los objetos y su uso en combate.
+
+### **Tipos de efecto (`ItemEffect`)**
+- `instant-win`: Gana el combate automáticamente (Master Ball).
+- `capture`: Captura al oponente actual y fuerza cambio por un miembro del equipo.
+- `stat-boost-50`: +50% a la estadística de combate actual.
+- `stat-boost-100`: +100% a la estadística de combate actual.
+- `shield`: Evita que el Pokémon activo se debilite en una derrota.
+- `reroll-stat`: Rerollea la estadística seleccionada para el combate.
+- `revive-all`: Revive a todos los Pokémon debilitados del equipo.
+- `revive-one`: Revive a un Pokémon debilitado seleccionado.
+- `tier-boost`: Eleva a nivel Tier 3 temporalmente para el combate.
+- `opponent-reroll`: Reemplaza al oponente actual por otro aleatorio (no funciona en Liga).
+- `opponent-nerf`: Reduce en 30% la estadística seleccionada del rival.
+
+### **Interfaz Item**
+- `id`: number (identificador único)
+- `name`: string
+- `image`: string (ruta/URL)
+- `effect`: `ItemEffect`
+- `used`: boolean
+- `description`: string
+
+---
+
+## 🛡️ Métodos de Objetos en GameService (items)
+
+- `useItem(item)`: Selecciona el objeto para el siguiente turno; no se consume al seleccionar.
+- `consumeItem(id)`: Marca el objeto como `used` y limpia `selectedItemForBattle`.
+- `esObjetoInmediato` (en Tablero): determina si muestra botón “¡USAR AHORA!” para el objeto.
+- `usarObjetoDirecto` (en Tablero): ruta de uso inmediato para `instant-win`, `tier-boost`, `opponent-reroll`, `capture`, `revive-all`, `reroll-stat`.
+
+---
+
+## 🧪 Métodos de pelea y estado adicionales en GameService (`game-service.ts`)
+
+Además de los ya descritos, se agregan:
+
+- `captureOpponent(index)`: Reemplaza el Pokémon del slot `index` en el equipo por el rival actual capturado, con vida completa.
+- `reviveAllPokemon()`: Revive todos los Pokémon del equipo (`isFainted = false`) y consume el objeto `revive-all`.
+- `revivePokemon(index)`: Revive a un miembro específico del equipo y consume el objeto `revive-one`.
+- `updateOpponentStatus(index, isFainted)`: Actualiza el estado `isFainted` para un miembro del equipo rival en Liga.
+- `applyInstantWin()`: Aplica `instant-win` en ligas o combate normal. Marca al rival como derrotado, consume objeto, procede en el flujo de victoria.
+- `applyForceCapture()`: Si se usa `capture`, activa el modo forzado de capturar y prepara el reemplazo con el oponente derrotado.
+- `rerollOpponent()`: Usa el objeto `opponent-reroll` para generar un nuevo rival fuera de Liga y consume el objeto.
+- `rerollStat()`: Usa el objeto `reroll-stat` para seleccionar una nueva estadística aleatoria y consume el objeto.
+
+#### Computed / estado derivado de interés
+- `isGameOver`: Verdadero si el equipo entero está debilitado (`isFainted`) y no es fase de selección.
+- `isLeagueVictory`: Verdadero si `isLeaguePhase` y `leagueWins >= 4`.
+- `canEvolve`: Verdadero si `victories >= 10` y `currentTier < 3`.
 
 ---
 
