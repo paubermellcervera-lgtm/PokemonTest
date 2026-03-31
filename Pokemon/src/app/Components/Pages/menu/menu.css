@@ -17,12 +17,14 @@
   position: relative;
 }
 .menu-title {
-  font-size: 4rem;
+  font-size: 3rem;
   color: white;
   text-shadow: 0.25rem 0.25rem 0.5rem rgba(0,0,0,0.8);
   margin-bottom: 3rem;
   z-index: 10;
   text-align: center;
+  display: flex;
+  flex-wrap: wrap;
 }
 .menu-container::before {
   content: '';
