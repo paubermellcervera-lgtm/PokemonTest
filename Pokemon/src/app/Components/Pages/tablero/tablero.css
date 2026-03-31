@@ -6,563 +6,220 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  gap: 0.15rem;
-  padding: 0.5rem clamp(1rem, 3vw, 2rem) 1rem clamp(1rem, 3vw, 2rem);
-  min-height: 100vh;
+  padding: 0.5rem clamp(1rem, 3vw, 2rem);
+  height: 100vh;
   width: 100%;
   background-image: url('/img/Fondo Combate.webp');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   background-attachment: fixed;
-  overflow-x: hidden;
-  overflow-y: auto;
-}
-
-.header {
-  width: 100%;
-  max-width: 80rem;
-  background: white;
-  padding: 0.4rem 1rem;
-  border-radius: 0.75rem;
-  box-shadow: 0 0.25rem 0.375rem rgba(0,0,0,0.05);
-  z-index: 20;
-}
-
-.header-nav {
-  margin-bottom: 0.4rem;
-}
-
-.top-info-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 0.25rem;
-  color: #555;
-  font-weight: bold;
-}
-
-.league-info {
-  color: #e67e22;
-  font-size: 1.1rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06rem;
-}
-
-/* ZONA CENTRAL DE BATALLA */
-.central-battle-zone {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  gap: 1rem;
-  margin: 0.25rem 0;
+  overflow: hidden;
   position: relative;
+}
+
+/* --- BOTÓN VOLVER CORNER --- */
+.btn-back-corner {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 100;
+  transition: transform 0.2s ease;
+}
+
+.btn-back-corner:hover { transform: scale(1.1); }
+
+.back-icon {
+  width: 3rem;
+  height: 3rem;
+  background-color: #f39c12;
+  border: 3px solid white;
+  border-radius: 50%;
+  padding: 0.3rem;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+/* --- INDICADORES SUPERIORES MINIMALISTAS --- */
+.league-indicator-strip {
+  background: rgba(0, 0, 0, 0.6);
+  color: #f1c40f;
+  padding: 0.4rem 2rem;
+  border-radius: 0 0 1rem 1rem;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1rem;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-top: none;
   z-index: 10;
 }
 
-.battle-divider {
-  flex-grow: 1;
-  height: 0.18rem;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+.selection-title-banner {
+  margin-top: 0.5rem;
+  text-align: center;
 }
 
-.battle-stats-center {
+.selection-title-banner h2 {
+  color: white;
+  text-shadow: 0 4px 8px rgba(0,0,0,0.8);
+  font-size: 1.8rem;
+  margin: 0;
+  letter-spacing: 0.2rem;
+}
+
+/* --- BADGES LATERALES --- */
+.side-info { position: absolute; top: 50%; transform: translateY(-50%); z-index: 100; }
+.side-info.left { left: 1rem; }
+.side-info.right { right: 1rem; }
+
+.side-badge {
+  display: flex; flex-direction: column; align-items: center; padding: 0.5rem 1rem;
+  background: white; border: 3px solid #333; border-radius: 0.75rem; box-shadow: 0 4px 10px rgba(0,0,0,0.3); min-width: 6rem;
+}
+.side-badge .label { font-size: 0.6rem; font-weight: 900; color: #7f8c8d; }
+.side-badge .value { font-size: 1.5rem; font-weight: 900; color: #2c3e50; }
+.tier-badge { border-color: #3498db; background: linear-gradient(135deg, #fff 0%, #ebf5fb 100%); }
+.victories-badge { border-color: #f1c40f; background: linear-gradient(135deg, #fff 0%, #fef9e7 100%); }
+
+/* --- ÁREA DE BATALLA --- */
+.battle-area {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: white;
-  padding: 0.2rem 1.5rem 0.4rem 1.5rem;
-  border-radius: 1.25rem;
-  box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.2);
-  border: 0.18rem solid #3498db;
+  justify-content: space-evenly;
+  width: 100%;
+  max-width: 87.5rem;
+  position: relative;
+  min-height: 0;
+}
+
+.central-battle-zone { display: flex; align-items: center; width: 100%; gap: 1rem; margin: 0.25rem 0; position: relative; z-index: 10; }
+.battle-divider { flex-grow: 1; height: 0.18rem; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent); }
+
+.battle-stats-center {
+  display: flex; flex-direction: column; align-items: center; background: white; padding: 0.2rem 1.5rem 0.4rem 1.5rem;
+  border-radius: 1.25rem; box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.2); border: 0.18rem solid #3498db;
   min-width: 18.75rem;
 }
 
-.vs-container {
-  margin-top: -0.8rem;
-  margin-bottom: 0.15rem;
-  z-index: 10;
-}
-
-.vs-text {
-  background: #e74c3c;
-  color: white;
-  font-weight: 900;
-  padding: 0.2rem 0.8rem;
-  border-radius: 0.625rem;
-  font-size: 0.9rem;
-  box-shadow: 0 0.25rem 0.5rem rgba(0,0,0,0.2);
-  border: 0.125rem solid white;
-}
-
-.stat-badge {
-  color: #2c3e50;
-  font-size: 1.1rem;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 0.1rem;
-  display: block;
-}
-
-.league-prompt {
-  margin-top: 0.2rem;
-  font-weight: bold;
-  color: #e67e22;
-  font-size: 0.7rem;
-  animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-  0% { opacity: 0.6; }
-  50% { opacity: 1; }
-  100% { opacity: 0.6; }
-}
+.vs-text { background: #e74c3c; color: white; font-weight: 900; padding: 0.2rem 0.8rem; border-radius: 0.625rem; font-size: 0.9rem; border: 0.125rem solid white; }
+.stat-badge { color: #2c3e50; font-size: 1.1rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1rem; }
 
 .multiplier-reveal {
-  margin-top: 0.4rem;
-  padding: 0.4rem 0.8rem;
-  border-radius: 0.5rem;
-  font-size: 0.4rem;
-  font-weight: bold;
-  animation: pop-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  text-align: center;
-  border: 0.125rem solid;
+  margin-top: 0.4rem; padding: 0.4rem 0.8rem; border-radius: 0.5rem; font-size: 0.4rem; font-weight: bold;
+  animation: pop-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); text-align: center; border: 0.125rem solid;
 }
+.multiplier-reveal.advantage { background-color: #2ecc71; color: white; border-color: #27ae60; box-shadow: 0 0 1rem rgba(46, 204, 113, 0.4); }
+.multiplier-reveal.disadvantage { background-color: #e74c3c; color: white; border-color: #c0392b; box-shadow: 0 0 1rem rgba(231, 76, 60, 0.4); }
 
-.multiplier-reveal.advantage {
-  background-color: #2ecc71;
-  color: white;
-  border-color: #27ae60;
-  box-shadow: 0 0 1rem rgba(46, 204, 113, 0.4);
-}
+/* --- GRID DE EQUIPO --- */
+.team-slots, .league-opponents { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; width: 100%; max-width: 60rem; }
 
-.multiplier-reveal.disadvantage {
-  background-color: #e74c3c;
-  color: white;
-  border-color: #c0392b;
-  box-shadow: 0 0 1rem rgba(231, 76, 60, 0.4);
-}
-
-@keyframes pop-in {
-  0% { transform: scale(0); opacity: 0; }
-  80% { transform: scale(1.1); }
-  100% { transform: scale(1); opacity: 1; }
-}
-
-/* ANIMACIÓN DE EVOLUCIÓN */
-.evolution-sprite-container {
-  width: 100%;
-  min-height: 16rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #333;
-  border-radius: 0.5rem;
-  position: relative;
-  overflow: hidden;
-  border: 0.2rem solid #fff;
-  box-shadow: 0 0 1rem rgba(255, 255, 255, 0.3);
-}
-
-.evo-img {
-  width: 7rem;
-  height: 7rem;
-  image-rendering: pixelated;
-}
-
-.white-filter .evo-img {
-  filter: brightness(0) invert(1);
-}
-
-.glow-effect {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, transparent 70%);
-  animation: glow 1.5s ease-out;
-}
-
-@keyframes glow {
-  0% { transform: scale(0); opacity: 0; }
-  50% { transform: scale(2); opacity: 1; }
-  100% { transform: scale(3); opacity: 0; }
-}
-
-/* OTROS ESTILOS DE BATALLA */
-.battle-area {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  max-width: 87.5rem;
-  gap: 0.25rem;
-  transition: all 0.5s ease;
-  position: relative;
-}
-
+.opponent-side, .player-side { width: 100%; display: flex; flex-direction: column; align-items: center; }
 .opponent-side h3, .player-side h3 {
-  color: white;
-  text-shadow: 0.125rem 0.125rem 0.25rem rgba(0, 0, 0, 0.8), 0 0 0.625rem rgba(0, 0, 0, 0.5);
-  font-size: 1.1rem;
-  margin-bottom: 0.25rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1rem;
-  text-align: center;
+  color: white; text-shadow: 0.125rem 0.125rem 0.25rem rgba(0, 0, 0, 0.8); font-size: 1.1rem;
+  margin-bottom: 0.25rem; text-transform: uppercase; letter-spacing: 0.1rem; text-align: center;
 }
 
 .vs-label {
-  color: white;
-  font-weight: 900;
-  font-size: 1rem;
-  text-shadow: 0.125rem 0.125rem 0.25rem rgba(0, 0, 0, 0.8);
-  background: rgba(0, 0, 0, 0.5);
-  padding: 0.25rem 1rem;
-  border-radius: 0.75rem;
-  letter-spacing: 0.125rem;
-  border: 0.125rem solid rgba(255, 255, 255, 0.3);
+  color: white; font-weight: 900; font-size: 1.2rem; text-shadow: 0 2px 4px black;
+  background: rgba(0, 0, 0, 0.5); padding: 0.5rem 2rem; border-radius: 2rem; border: 2px solid white;
 }
 
-/* LIGA LAYOUT */
-.league-opponents {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.75rem;
-  width: 100%;
+/* --- POKEBALLS Y REROLL --- */
+.slot-container { transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+.initial-pokeball-container {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 50;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  cursor: pointer; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(4px);
+  border-radius: 0.5rem; border: 2px dashed rgba(255, 255, 255, 0.5);
 }
+.pokeball-reveal { width: 5rem; height: 5rem; image-rendering: pixelated; animation: pokeball-bounce 2s infinite ease-in-out; }
+.pokeball-hint { color: white; font-size: 0.7rem; font-weight: bold; margin-top: 0.5rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
 
-.rival-slot {
-  transition: all 0.3s ease;
-  position: relative;
+.btn-reroll-pokeball {
+  background: #f1c40f; border: 2px solid #333; border-radius: 50%; width: 3.5rem; height: 3.5rem;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 0 #d4a017;
 }
+.pokeball-icon { width: 1.8rem; height: 1.8rem; }
+.reroll-count { font-size: 0.7rem; font-weight: 900; color: #333; }
 
-.rival-slot.selectable {
-  cursor: pointer;
-  animation: pulse-border-red 2s infinite ease-in-out;
-}
-
-.rival-slot.selectable:hover {
-  transform: translateY(-0.5rem) scale(1.05);
-  filter: drop-shadow(0 0.8rem 1.5rem rgba(231, 76, 60, 0.6));
-  z-index: 10;
-}
-
-.rival-slot.fainted {
-  opacity: 0.6;
-  filter: grayscale(80%);
-  pointer-events: none;
-}
-
-@keyframes pulse-border-red {
-  0% { box-shadow: 0 0 0.5rem rgba(231, 76, 60, 0.3); }
-  50% { box-shadow: 0 0 1rem rgba(231, 76, 60, 0.7); }
-  100% { box-shadow: 0 0 0.5rem rgba(231, 76, 60, 0.3); }
-}
-
-.selected-rival {
-  transform: scale(1.05);
-  filter: drop-shadow(0 0 0.9rem #f1c40f);
-  z-index: 10;
-}
-
-.selected-rival::after {
-  content: '🎯';
-  position: absolute;
-  top: -1.25rem;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 2rem;
-}
-
-.battle-area.animating .slot-container:not(.combat-focus),
-.battle-area.animating .rival-slot:not(.combat-focus),
-.battle-area.animating .opponent-side:not(.combat-focus) {
-  opacity: 0.2;
-  filter: grayscale(80%) blur(0.125rem);
-  pointer-events: none;
-}
-
-.slot-container, .rival-slot, .opponent-side {
-  transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  position: relative;
-}
-
-.player-side .slot-container.combat-focus {
-  transform: scale(1.05);
-  box-shadow: 0 0 2rem rgba(52, 152, 219, 0.6);
-  z-index: 100;
-}
-
-/* En modo normal, el contenedor entero se mueve */
-.opponent-side.combat-focus:not(:has(.league-opponents)) {
-  transform: scale(1.05);
-  box-shadow: 0 0 2rem rgba(231, 76, 60, 0.6);
-  z-index: 100;
-}
-
-/* En modo liga, solo el slot individual se mueve */
-.rival-slot.combat-focus {
-  transform: scale(1.05);
-  box-shadow: 0 0 2rem rgba(231, 76, 60, 0.6);
-  z-index: 100;
-}
-
-.team-slots {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
-  width: 100%;
-}
-
-.btn-confirm {
-  background-color: #2ecc71;
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 1.8rem;
-  font-size: 1.1rem;
-  font-weight: bold;
-  cursor: pointer;
-  margin-top: 1rem;
-}
-
-.game-over-modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: white;
-  padding: 3rem;
-  border-radius: 0.9rem;
-  box-shadow: 0 0 3.125rem rgba(0,0,0,0.5);
-  text-align: center;
-  z-index: 1000;
-  max-width: 31.25rem;
-  width: 90%;
-}
-
-.victory-modal {
-  border: 0.3rem solid #f1c40f;
-  background: linear-gradient(135deg, #fff 0%, #f9f9f9 100%);
-}
-
-.final-team {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin: 1rem 0;
-}
-
-.winner-img {
-  width: 4rem;
-  height: 4rem;
-  filter: drop-shadow(0 0 0.2rem #f1c40f);
-  image-rendering: pixelated;
-}
-/* SECCIÓN DE OBJETOS */
+/* --- OBJETOS --- */
+.items-inventory-container { flex-shrink: 0; margin: 0.1rem 0; }
 .items-inventory {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
-  background: rgba(0, 0, 0, 0.4);
-  padding: 0.3rem 1rem;
-  border-radius: 2rem;
-  border: 0.125rem solid rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(0.3125rem);
-  width: fit-content;
+  display: flex; justify-content: center; gap: 1rem; background: rgba(0, 0, 0, 0.4);
+  padding: 0.3rem 1rem; border-radius: 2rem; border: 0.125rem solid rgba(255, 255, 255, 0.2); backdrop-filter: blur(0.3125rem);
+}
+.item-slot { display: flex; flex-direction: column; align-items: center; gap: 0.1rem; cursor: pointer; transition: all 0.3s; min-width: 4.5rem; position: relative; }
+.item-slot.used { filter: grayscale(100%); opacity: 0.5; cursor: not-allowed; }
+.item-slot.active { transform: scale(1.1); }
+.item-slot.active .item-icon-container { border: 3px solid #f1c40f; box-shadow: 0 0 1rem rgba(241, 196, 15, 0.5); }
+
+.item-icon-container { width: 3.5rem; height: 3.5rem; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s; border: 2px solid transparent; }
+.item-img { width: 2.5rem; height: 2.5rem; }
+.item-name { color: white; font-size: 0.65rem; font-weight: bold; text-transform: uppercase; }
+
+.item-active-badge {
+  position: absolute; top: -0.5rem; right: -0.5rem; background: #f1c40f; color: #2c3e50;
+  padding: 0.2rem 0.5rem; border-radius: 0.4rem; font-size: 0.6rem; font-weight: 900;
+  animation: flash 1s infinite; box-shadow: 0 0.2rem 0.5rem rgba(0,0,0,0.3); z-index: 5;
 }
 
-.item-slot {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.1rem;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  position: relative;
-  min-width: 4.5rem;
+.btn-use-now {
+  position: absolute; bottom: -1.8rem; left: 50%; margin-left: -3rem; width: 6rem;
+  background: #2ecc71; color: white; border: none; padding: 0.3rem 0; border-radius: 0.5rem;
+  font-size: 0.6rem; font-weight: 900; cursor: pointer; box-shadow: 0 0.15rem 0 #27ae60;
+  animation: pop-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) both; z-index: 5;
 }
+.btn-use-now:hover { background: #27ae60; transform: scale(1.05); }
+.btn-use-now:active { transform: translateY(0.1rem); box-shadow: none; }
 
-.item-slot.used {
-  filter: grayscale(100%);
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.item-slot:not(.used):hover {
-  transform: scale(1.1);
-}
-
-.item-icon-container {
-  width: 3.5rem;
-  height: 3.5rem;
-  background: radial-gradient(circle, #fdfbfb 0%, #ebedee 100%);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 0.25rem 0.625rem rgba(0,0,0,0.3);
-  border: 0.125rem solid #fff;
-}
-
-.item-img {
-  width: 2.5rem;
-  height: 2.5rem;
-  image-rendering: pixelated;
-}
-
-.item-name {
-  color: white;
-  font-size: 0.65rem;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 0.03rem;
-  text-shadow: 0.06rem 0.06rem 0.125rem black;
-}
-
-/* ANIMACIÓN DE OBJETO GRANDE */
+/* --- ANIMACIONES DE OBJETOS (CINEMATIC OVERLAY) --- */
 .item-animation-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.8);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.8); display: flex; flex-direction: column;
+  align-items: center; justify-content: center; z-index: 2000;
   animation: fade-in 0.5s ease;
 }
 
+.item-animation-overlay.boost-active {
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(0, 0, 0, 0.9) 100%);
+  transition: background 0.5s ease;
+}
+
 .big-item-container {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2rem;
+  position: relative; display: flex; flex-direction: column; align-items: center; gap: 2rem;
 }
 
 .big-item-img {
-  width: 12rem;
-  height: 12rem;
-  image-rendering: pixelated;
+  width: 12rem; height: 12rem; image-rendering: pixelated;
   animation: item-bounce-in 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   filter: drop-shadow(0 0 2rem rgba(255, 255, 255, 0.8));
 }
 
 .item-use-text {
-  color: #f1c40f;
-  font-size: 2.5rem;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 0.3rem;
-  text-align: center;
-  text-shadow: 0 0 1.25rem rgba(241, 196, 15, 0.6);
+  color: #f1c40f; font-size: 2.5rem; font-weight: 900; text-transform: uppercase;
+  letter-spacing: 0.3rem; text-align: center; text-shadow: 0 0 1.25rem rgba(241, 196, 15, 0.6);
   animation: slide-up 0.6s ease-out 0.3s both;
 }
 
 .item-use-desc {
-  color: white;
-  font-size: 1.2rem;
-  max-width: 30rem;
-  text-align: center;
-  background: rgba(0, 0, 0, 0.75);
-  padding: 1.25rem 2rem;
-  border-radius: 1rem;
-  border: 0.125rem solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 0.5rem 2rem rgba(0,0,0,0.5);
+  color: white; font-size: 1.2rem; max-width: 30rem; text-align: center;
+  background: rgba(0, 0, 0, 0.75); padding: 1.25rem 2rem; border-radius: 1rem;
+  border: 0.125rem solid rgba(255, 255, 255, 0.3); box-shadow: 0 0.5rem 2rem rgba(0,0,0,0.5);
   animation: slide-up 0.6s ease-out 0.5s both;
 }
 
-@keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes item-bounce-in {
-  0% { transform: scale(0) rotate(-45deg); opacity: 0; }
-  70% { transform: scale(1.2) rotate(10deg); }
-  100% { transform: scale(1) rotate(0); opacity: 1; }
-}
-
-@keyframes slide-up {
-  from { transform: translateY(2rem); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-.item-active-badge {
-  position: absolute;
-  top: -0.5rem;
-  right: -0.5rem;
-  background: #f1c40f;
-  color: #2c3e50;
-  padding: 0.2rem 0.5rem;
-  border-radius: 0.4rem;
-  font-size: 0.6rem;
-  font-weight: 900;
-  animation: flash 1s infinite;
-  box-shadow: 0 0.2rem 0.5rem rgba(0,0,0,0.3);
-  z-index: 5;
-}
-
-.btn-use-now {
-  position: absolute;
-  bottom: -1.8rem;
-  left: 50%;
-  margin-left: -3rem; 
-  width: 6rem;
-  background: #2ecc71;
-  color: white;
-  border: none;
-  padding: 0.3rem 0;
-  border-radius: 0.5rem;
-  font-size: 0.6rem;
-  font-weight: 900;
-  cursor: pointer;
-  box-shadow: 0 0.15rem 0 #27ae60;
-  animation: pop-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
-  white-space: nowrap;
-  z-index: 5;
-  text-align: center;
-}
-
-.btn-use-now:hover {
-  background: #27ae60;
-  transform: scale(1.1);
-}
-
-.btn-use-now:active {
-  transform: translateY(0.1rem);
-  box-shadow: 0 0.1rem 0 #27ae60;
-}
-
-@keyframes flash {
-  0% { opacity: 1; }
-  50% { opacity: 0.6; }
-  100% { opacity: 1; }
-}
-
-/* MEJORAS DE ATRIBUTOS EN ANIMACIÓN */
 .stat-boost-indicator {
-  position: absolute;
-  top: 1rem;
-  right: -1rem;
-  padding: 0.8rem 1.8rem;
-  border-radius: 2.5rem;
-  font-size: 1.8rem;
-  font-weight: 900;
-  color: white;
-  text-transform: uppercase;
-  letter-spacing: 0.15rem;
-  box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.5);
+  position: absolute; top: 1rem; right: -1rem; padding: 0.8rem 1.8rem;
+  border-radius: 2.5rem; font-size: 1.8rem; font-weight: 900; color: white;
+  text-transform: uppercase; letter-spacing: 0.15rem; box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.5);
   animation: boost-pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.8s both;
-  z-index: 2010;
-  border: 0.2rem solid white;
+  z-index: 2010; border: 0.2rem solid white;
 }
 
 .boost-med { background: linear-gradient(135deg, #e67e22, #d35400); }
@@ -576,19 +233,27 @@
 .boost-priority { background: linear-gradient(135deg, #00cec9, #0984e3); }
 .boost-double { background: linear-gradient(135deg, #f1c40f, #e67e22); color: #2c3e50 !important; font-weight: 950 !important; }
 
-.item-animation-overlay.boost-active {
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(0, 0, 0, 0.9) 100%);
-  transition: background 0.5s ease;
+/* --- ANIMACIONES --- */
+@keyframes item-bounce-in {
+  0% { transform: scale(0) rotate(-45deg); opacity: 0; }
+  70% { transform: scale(1.2) rotate(10deg); }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
 }
 
-/* Colores de fondo dinámicos según el tipo de boost */
-.item-animation-overlay:has(.boost-win) { background: radial-gradient(circle, rgba(142, 68, 173, 0.3) 0%, rgba(0, 0, 0, 0.9) 100%); }
-.item-animation-overlay:has(.boost-capture) { background: radial-gradient(circle, rgba(241, 196, 15, 0.2) 0%, rgba(0, 0, 0, 0.9) 100%); }
-.item-animation-overlay:has(.boost-revive-all), 
-.item-animation-overlay:has(.boost-revive) { background: radial-gradient(circle, rgba(52, 152, 219, 0.2) 0%, rgba(0, 0, 0, 0.9) 100%); }
-.item-animation-overlay:has(.boost-high) { background: radial-gradient(circle, rgba(231, 76, 60, 0.3) 0%, rgba(0, 0, 0, 0.9) 100%); }
+@keyframes slide-up {
+  from { transform: translateY(2rem); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
 
 @keyframes boost-pop {
   0% { transform: scale(0) rotate(-20deg) translateX(2rem); opacity: 0; }
   100% { transform: scale(1) rotate(-10deg) translateX(0); opacity: 1; }
 }
+
+@keyframes pokeball-bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pop-in { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+@keyframes glow { 0% { transform: scale(0); opacity: 0; } 50% { transform: scale(2); opacity: 1; } 100% { transform: scale(3); opacity: 0; } }
+
+/* Debug */
+.btn-debug { position: fixed; bottom: 1rem; right: 1rem; opacity: 0.5; }

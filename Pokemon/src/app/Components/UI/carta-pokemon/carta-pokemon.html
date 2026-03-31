@@ -23,20 +23,28 @@
         }
       </div>
 
-      <ul class="stats-list">
+      <ul class="stats-list" [class.single-stat-mode]="showOnlyStatId()">
         @if (hideStats() && !revealed()) {
           @for (stat of statsFiltradas(); track stat.name) {
             <li>
-              <span class="stat-name">{{ getStatShorthand(stat.name) }}:</span>
-              <span class="stat-value">???</span>
+              <span class="stat-item">
+                @if (!showOnlyStatId()) {
+                  <span class="stat-name">{{ getStatShorthand(stat.name) }}:</span>
+                }
+                <span class="stat-value">???</span>
+              </span>
             </li>
           }
         } @else {
           @for (stat of statsFiltradas(); track stat.name) {
             <li>
-              <span class="stat-name">{{ getStatShorthand(stat.name) }}:</span>
-              <span class="stat-value">
-                {{ revealed() ? (displayValues()[stat.name] || 0) : stat.value }}
+              <span class="stat-item">
+                @if (!showOnlyStatId()) {
+                  <span class="stat-name">{{ getStatShorthand(stat.name) }}:</span>
+                }
+                <span class="stat-value">
+                  {{ revealed() ? (displayValues()[stat.name] || 0) : stat.value }}
+                </span>
               </span>
             </li>
           }

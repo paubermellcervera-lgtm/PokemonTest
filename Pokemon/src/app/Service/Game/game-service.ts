@@ -81,7 +81,7 @@ export class GameService {
   readonly selectedStatId = signal<string>('');
   
   readonly rerolls = signal<number[]>([3, 3, 3]);
-  readonly isRerollGlobalCooldown = signal<boolean>(false);
+  readonly isRerollSlotCooldown = signal<boolean[]>([false, false, false]);
   readonly isSelectionPhase = signal<boolean>(true);
 
   readonly isEvolving = signal<boolean>(false);
@@ -131,7 +131,7 @@ export class GameService {
     this.currentTier.set(1);
     this.team.set([null, null, null]);
     this.rerolls.set([3, 3, 3]);
-    this.isRerollGlobalCooldown.set(false);
+    this.isRerollSlotCooldown.set([false, false, false]);
     this.isSelectionPhase.set(true);
     this.isEvolving.set(false);
     this.opponent.set(null);
@@ -154,14 +154,29 @@ export class GameService {
 
   async generatePokemonForSlot(index: number) {
     const currentRerolls = this.rerolls();
-    if (currentRerolls[index] > 0 && !this.isRerollGlobalCooldown()) {
-      this.isRerollGlobalCooldown.set(true);
+    const currentCooldowns = this.isRerollSlotCooldown();
+    
+    // Si es el primer roll (rerolls === 3), no hay timeout.
+    // Si no, comprobamos el cooldown individual del slot.
+    const isFirstRoll = currentRerolls[index] === 3;
+    
+    if (currentRerolls[index] > 0 && (isFirstRoll || !currentCooldowns[index])) {
+      
+      // Activar cooldown solo si NO es el primer roll
+      if (!isFirstRoll) {
+        this.isRerollSlotCooldown.update(cv => {
+          const newCv = [...cv];
+          newCv[index] = true;
+          return newCv;
+        });
+      }
       
       this.loadingSlots.update(ls => {
         const newLs = [...ls];
         newLs[index] = true;
         return newLs;
       });
+
       try {
         let newPokemon: Pokemon;
         let isDuplicate = true;
@@ -185,10 +200,17 @@ export class GameService {
           newLs[index] = false;
           return newLs;
         });
-        // Esperar 1 segundo antes de permitir otro reroll
-        setTimeout(() => {
-          this.isRerollGlobalCooldown.set(false);
-        }, 1000);
+
+        // Limpiar cooldown individual después de 1s si se activó
+        if (!isFirstRoll) {
+          setTimeout(() => {
+            this.isRerollSlotCooldown.update(cv => {
+              const newCv = [...cv];
+              newCv[index] = false;
+              return newCv;
+            });
+          }, 1000);
+        }
       }
     }
   }

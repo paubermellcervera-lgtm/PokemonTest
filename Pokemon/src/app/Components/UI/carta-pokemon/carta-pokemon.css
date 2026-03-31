@@ -96,21 +96,33 @@
   list-style: none;
   padding: 0;
   margin: 0.4rem 0 0 0;
-  text-align: left;
-  font-size: clamp(0.7rem, 1.5vw, 0.9rem);
-}
-
-.stats-list li {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  margin-bottom: 0.2rem;
-  white-space: nowrap;
   gap: 0.2rem;
 }
 
-.stats-list li:last-child {
-  margin-bottom: 0;
+.stat-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+  font-size: clamp(0.8rem, 1.8vw, 1.1rem);
+}
+
+.stats-list.single-stat-mode {
+  margin-top: 0.8rem;
+}
+
+.stats-list.single-stat-mode .stat-value {
+  font-size: 2.2rem;
+  color: #2c3e50;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.stats-list li {
+  width: 100%;
 }
 
 .stat-name {
@@ -124,9 +136,14 @@
 }
 
 .empty-slot {
-  font-size: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
+  font-size: 6rem;
   color: #ccc;
   font-weight: bold;
+  justify-self: center;
 }
 
 .spinner-overlay {

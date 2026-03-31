@@ -1,27 +1,21 @@
 <div class="tablero-container">
   
-  <div class="header">
-    <div class="header-nav">
-      <button routerLink="/menu" class="btn-danger">⬅ Menú</button>
-      
-    </div>
-    
-    <div class="top-info-bar">
-      @if (esLiga) {
-        <div class="league-info">LIGA POKÉMON: <strong>Ronda {{ gameService.leagueWins() + 1 }} / 4</strong></div>
-      } @else {
-        <div class="tier-info">Tier actual: <strong>{{ gameService.currentTier() }}</strong></div>
-      }
-      <div class="total-victories-badge">Victorias Totales: <strong>{{ gameService.totalVictories() }}</strong></div>
-    </div>
+  <!-- BOTÓN VOLVER (SOLO EL BOTÓN A LA IZQUIERDA) -->
+  <button routerLink="/menu" class="btn-back-corner">
+    <img src="/img/Flecha atrás.png" alt="Menú" class="back-icon">
+  </button>
 
-    @if (esFaseSeleccion) {
-      <div class="selection-header">
-        <h2>Selecciona tu equipo</h2>
-        <p>Prepara tus 3 Pokémon (3 Rerolls por slot)</p>
-      </div>
-    }
-  </div>
+  @if (esLiga) {
+    <div class="league-indicator-strip">
+      LIGA POKÉMON: <strong>Ronda {{ gameService.leagueWins() + 1 }} / 4</strong>
+    </div>
+  }
+
+  @if (esFaseSeleccion) {
+    <div class="selection-title-banner">
+      <h2>PREPARA TU EQUIPO</h2>
+    </div>
+  }
 
   <!-- ZONA DE OBJETOS -->
   @if (!esFaseSeleccion && !gameService.isGameOver() && !gameService.isLeagueVictory() && !gameService.isEvolving()) {
@@ -40,7 +34,7 @@
               <div class="item-active-badge">ACTIVO</div>
               @if (esObjetoInmediato(item)) {
                 <button class="btn-use-now" (click)="usarObjetoDirecto($event, item)">
-                  ¡USAR AHORA!
+                  ¡USAR!
                 </button>
               }
             }
@@ -69,8 +63,9 @@
 
   <div class="battle-area" [class.animating]="animatingIndex() !== null">
     <div class="opponent-side" [class.combat-focus]="animatingIndex() !== null">
-      <h3>{{ esLiga ? 'Alto Mando' : 'Oponente' }}</h3>
-      
+      @if (!esFaseSeleccion) {
+        <h3>{{ esLiga ? 'Alto Mando' : 'Oponente' }}</h3>
+      }
       @if (esLiga) {
         <div class="league-opponents">
           @for (rival of rivalesLiga; track $index) {
@@ -102,7 +97,18 @@
     </div>
 
     <div class="central-battle-zone">
+      <!-- Lado Izquierdo: Tier -->
+      <div class="side-info left">
+        @if (!esLiga) {
+          <div class="side-badge tier-badge">
+            <span class="label">TIER</span>
+            <span class="value">{{ gameService.currentTier() }}</span>
+          </div>
+        }
+      </div>
+
       <div class="battle-divider"></div>
+      
       @if (!esFaseSeleccion) {
         <div class="battle-stats-center">
           @if (gameService.isEvolving()) {
@@ -130,9 +136,18 @@
           }
         </div>
       } @else {
-        <div class="vs-label">PREPARACIÓN</div>
+        <div class="vs-label">V S</div>
       }
+      
       <div class="battle-divider"></div>
+
+      <!-- Lado Derecho: Victorias -->
+      <div class="side-info right">
+        <div class="side-badge victories-badge">
+          <span class="label">VICTORIAS</span>
+          <span class="value">{{ gameService.totalVictories() }}</span>
+        </div>
+      </div>
     </div>
 
     <div class="player-side">
@@ -140,11 +155,11 @@
       <div class="team-slots">
         @for (slot of [0, 1, 2]; track slot) {
           <div class="slot-container" [class.combat-focus]="animatingIndex() === slot">
-            @if (esFaseSeleccion) {
-              <div class="reroll-controls">
-                <button (click)="reroll(slot)" [disabled]="rerolls[slot] === 0 || gameService.isRerollGlobalCooldown()" class="btn-warning">
-                  <i class="fa-solid fa-recycle"></i> Reroll ({{ rerolls[slot] }})
-                </button>
+            
+            @if (esFaseSeleccion && rerolls[slot] === 3) {
+              <div class="initial-pokeball-container" (click)="reroll(slot)">
+                <img src="/img/poke-ball.png" alt="Generar" class="pokeball-reveal">
+                <span class="pokeball-hint">¡Pulsa para elegir!</span>
               </div>
             }
 
@@ -165,9 +180,19 @@
                 (click)="seleccionarParaBatalla(slot)"
                 [class.selectable]="(!esFaseSeleccion && miEquipo[slot] && !miEquipo[slot]!.isFainted && (!esLiga || selectedRivalIndex() !== null)) || (isReviveMode() && miEquipo[slot]?.isFainted)"
                 [class.fainted]="miEquipo[slot]?.isFainted"
+                [class.hidden-card]="esFaseSeleccion && rerolls[slot] === 3"
                 [revealed]="animatingIndex() === slot"
                 [multiplier]="animatingIndex() === slot && showMultiplier() ? currentMultiplierWithBonus() : 1"
               ></app-carta-pokemon>
+            }
+
+            @if (esFaseSeleccion && rerolls[slot] < 3) {
+              <div class="reroll-controls-below">
+                <button (click)="reroll(slot)" [disabled]="rerolls[slot] === 0 || gameService.isRerollSlotCooldown()[slot]" class="btn-reroll-pokeball">
+                  <img src="/img/poke-ball.png" alt="Reroll" class="pokeball-icon">
+                  <span class="reroll-count">{{ rerolls[slot] }}</span>
+                </button>
+              </div>
             }
           </div>
         }
@@ -204,4 +229,4 @@
     </div>
   }
 </div>
-<button (click)="Chetos()" class="btn-success">Chetos</button>
+<button (click)="Chetos()" class="btn-success btn-debug">Chetos</button>

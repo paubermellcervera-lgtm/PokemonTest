@@ -13,15 +13,51 @@
 .header {
   padding: 0.15rem 0.5rem !important;
   margin-bottom: 0.1rem !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+}
+
+.header-nav {
+  margin-bottom: 0 !important;
+}
+
+.btn-back .back-icon {
+  width: 1.8rem !important;
 }
 
 .top-info-bar {
-  flex-direction: row !important;
-  justify-content: space-between !important;
-  font-size: 0.65rem !important;
+  flex: 1 !important;
+  margin-top: 0 !important;
+  margin-left: 1rem !important;
 }
 
-/* Encabezados compactos para Oponente y Equipo */
+/* Badges laterales en móvil: más pequeños y flotantes */
+.side-info {
+  position: absolute !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 100 !important;
+}
+
+.side-info.left { left: 0.2rem !important; }
+.side-info.right { right: 0.2rem !important; }
+
+.side-badge {
+  padding: 0.2rem 0.4rem !important;
+  min-width: 3.5rem !important;
+  border-width: 2px !important;
+}
+
+.side-badge .label {
+  font-size: 0.45rem !important;
+}
+
+.side-badge .value {
+  font-size: 0.9rem !important;
+}
+
+/* Encabezados compactos */
 .opponent-side h3, .player-side h3 {
   font-size: 0.8rem !important;
   margin: 0.05rem 0 !important;
@@ -30,8 +66,6 @@
   width: 100% !important;
   padding: 0.1rem 0 !important;
   border-radius: 0.25rem !important;
-  text-align: center !important;
-  text-transform: uppercase !important;
 }
 
 .central-battle-zone {
@@ -39,68 +73,25 @@
   gap: 0.1rem !important;
 }
 
-/* Estabilización del panel central */
 .battle-stats-center {
   min-width: 10rem !important;
   padding: 0.1rem 0.4rem !important;
-  min-height: 5rem !important; /* Espacio reservado para que no salten las cartas */
-  justify-content: center !important;
-  border-width: 0.1rem !important;
+  min-height: 5rem !important;
 }
 
-.battle-stats-center br {
-  display: none !important; /* Quitamos saltos de línea físicos para ganar espacio */
-}
-
-.vs-container {
-  margin-top: 0 !important;
-  margin-bottom: 0.05rem !important;
-}
-
-.vs-text {
-  font-size: 0.75rem !important;
-  padding: 0.1rem 0.5rem !important;
-}
-
-.stat-badge {
-  font-size: 0.8rem !important;
-}
-
-/* Multiplicador legible en móvil */
 .multiplier-reveal {
   font-size: 0.85rem !important;
-  margin-top: 0.15rem !important;
-  padding: 0.15rem 0.4rem !important;
-  z-index: 50 !important;
 }
 
 .battle-area {
   flex: 1 !important;
-  display: flex !important;
-  flex-direction: column !important;
   justify-content: space-evenly !important;
-  min-height: 0 !important;
 }
 
-.opponent-side, .player-side {
-  flex: 0 1 auto !important;
-  width: 100% !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-}
-
-.team-slots, .league-opponents {
-  gap: 0.2rem !important;
-  margin-top: 0.05rem !important;
-}
-
-/* Inventario compacto */
 .items-inventory {
   gap: 0.3rem !important;
   padding: 0.15rem 0.5rem !important;
   margin: 0.05rem auto !important;
-  border-radius: 1rem !important;
 }
 
 .item-icon-container {
@@ -116,5 +107,3 @@
 .item-name {
   font-size: 0.4rem !important;
 }
-
-/* Mantener animaciones: No tocamos .animating ni .combat-focus ya que vienen de tablero.css */
