@@ -1,4 +1,4 @@
-import { Component, input, signal, effect } from '@angular/core';
+import { Component, input, signal, effect, computed } from '@angular/core';
 import { TitleCasePipe } from '@angular/common';
 import { Pokemon, ALL_STATS } from '../../../Model/Pokemon';
 import { getTypeIconUrl, TYPE_COLORS } from '../../../Utils/type-effectiveness';
@@ -19,6 +19,15 @@ export class CartaPokemon {
 
   displayValues = signal<{ [key: string]: number }>({});
   private currentMultiplierValue = 1;
+
+  statsFiltradas = computed(() => {
+    const p = this.pokemon();
+    if (!p) return [];
+    if (this.showOnlyStatId()) {
+      return p.stats.filter(s => s.name === this.showOnlyStatId());
+    }
+    return p.stats;
+  });
 
   constructor() {
     effect(() => {
@@ -86,15 +95,6 @@ export class CartaPokemon {
         }));
       }, intervalTime);
     });
-  }
-
-  get statsFiltradas() {
-    const p = this.pokemon();
-    if (!p) return [];
-    if (this.showOnlyStatId()) {
-      return p.stats.filter(s => s.name === this.showOnlyStatId());
-    }
-    return p.stats;
   }
 
   getStatShorthand(statName: string): string {
