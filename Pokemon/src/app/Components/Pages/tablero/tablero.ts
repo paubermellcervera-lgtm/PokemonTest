@@ -78,30 +78,35 @@ export class Tablero {
   async activarObjeto(item: Item) {
     if (item.used || this.animatingItem() || this.animatingIndex() !== null) return;
     
-    // Si ya está seleccionado, lo desactivamos
+    // Al cambiar o seleccionar cualquier objeto, reseteamos el modo revivir
+    this.isReviveMode.set(false);
+
+    // Si ya es el activo y se vuelve a pulsar, lo quitamos
     if (this.gameService.selectedItemForBattle()?.id === item.id) {
+      if (this.esObjetoInmediato(item)) return;
       this.gameService.selectedItemForBattle.set(null);
-      if (item.effect === 'revive-one') {
-        this.isReviveMode.set(false);
-      }
       return;
     }
 
     // Reproducir SIEMPRE la animación informativa al seleccionar
     await this.ejecutarAnimacionObjeto(item);
-
     
-    if (item.effect === 'revive-one') {
-      this.isReviveMode.set(true);
-    }
-
-    // Marcar como seleccionado para el combate
+    // Marcar como seleccionado
     this.gameService.useItem(item);
   }
 
   async usarObjetoDirecto(event: Event, item: Item) {
     event.stopPropagation();
     if (item.used || this.animatingIndex() !== null) return;
+
+    // Validación: Comprobar si hay algún pokemon derrotado para los objetos de revivir
+    if (item.effect === 'revive-all' || item.effect === 'revive-one') {
+      const hasFainted = this.gameService.team().some(p => p && p.isFainted);
+      if (!hasFainted) {
+        alert('¡No tienes ningún Pokémon derrotado que revivir!');
+        return;
+      }
+    }
 
     if (item.effect === 'instant-win') {
       await this.gameService.applyInstantWin();
@@ -111,8 +116,11 @@ export class Tablero {
       await this.gameService.rerollOpponent();
     } else if (item.effect === 'capture') {
       await this.gameService.applyForceCapture();
-    }else if (item.effect === 'revive-all') {
+    } else if (item.effect === 'revive-all') {
       await this.gameService.reviveAllPokemon();
+    } else if (item.effect === 'revive-one') {
+      this.isReviveMode.set(true);
+      // No consumimos el objeto aquí, se consume en seleccionarParaBatalla/handlePokemonClick
     } else if (item.effect === 'reroll-stat') {
       await this.gameService.rerollStat();
     }
@@ -125,7 +133,7 @@ export class Tablero {
   }
 
   esObjetoInmediato(item: Item): boolean {
-    return ['instant-win', 'tier-boost', 'opponent-reroll', 'capture', 'revive-all', 'reroll-stat'].includes(item.effect);
+    return ['instant-win', 'tier-boost', 'opponent-reroll', 'capture', 'revive-all', 'revive-one', 'reroll-stat'].includes(item.effect);
   }
 
   async volverAlMenu() {
@@ -200,14 +208,17 @@ export class Tablero {
       this.animatingIndex.set(index);
       this.animatingRivalIndex.set(rivalIndex);
       
-      await new Promise(resolve => setTimeout(resolve, 600));
+      // Wait for clash animation (0.6s) + impact/shake (0.2s)
+      await new Promise(resolve => setTimeout(resolve, 800));
       this.revealRivalStat.set(true);
       
-      // Mostrar Multiplicador
+      // Mostrar Multiplicador with a slight delay after revealing stats
       this.currentMultiplier.set(getMaxTypeEffectiveness(pokemon.types, rival.types));
-      await new Promise(resolve => setTimeout(resolve, 800));
+      await new Promise(resolve => setTimeout(resolve, 600));
       this.showMultiplier.set(true);
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Let the multiplier pop and the moment linger
+      await new Promise(resolve => setTimeout(resolve, 1800));
       
       await this.gameService.resolveLeagueBattle(index, rivalIndex);
       
@@ -222,14 +233,18 @@ export class Tablero {
       if (!rival) return;
 
       this.animatingIndex.set(index);
-      await new Promise(resolve => setTimeout(resolve, 600));
+      
+      // Wait for clash animation (0.6s) + impact/shake (0.2s)
+      await new Promise(resolve => setTimeout(resolve, 800));
       this.revealRivalStat.set(true);
 
-      // Mostrar Multiplicador
+      // Mostrar Multiplicador with a slight delay
       this.currentMultiplier.set(getMaxTypeEffectiveness(pokemon.types, rival.types));
-      await new Promise(resolve => setTimeout(resolve, 800));
+      await new Promise(resolve => setTimeout(resolve, 600));
       this.showMultiplier.set(true);
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Let the moment linger
+      await new Promise(resolve => setTimeout(resolve, 1800));
 
       await this.gameService.resolveBattle(index);
       this.animatingIndex.set(null);

@@ -5,11 +5,7 @@
     <img src="/img/Flecha atrás.png" alt="Menú" class="back-icon">
   </button>
 
-  @if (esLiga) {
-    <div class="league-indicator-strip">
-      LIGA POKÉMON: <strong>Ronda {{ gameService.leagueWins() + 1 }} / 4</strong>
-    </div>
-  }
+
 
   @if (esFaseSeleccion) {
     <div class="selection-title-banner">
@@ -30,14 +26,16 @@
               <img [src]="item.image" [alt]="item.name" class="item-img">
             </div>
             <span class="item-name">{{ item.name }}</span>
-            @if (gameService.selectedItemForBattle()?.id === item.id) {
-              <div class="item-active-badge">ACTIVO</div>
-              @if (esObjetoInmediato(item)) {
-                <button class="btn-use-now" (click)="usarObjetoDirecto($event, item)">
-                  ¡USAR!
-                </button>
+              @if (gameService.selectedItemForBattle()?.id === item.id) {
+                @if (!esObjetoInmediato(item)) {
+                  <div class="item-active-badge">ACTIVO</div>
+                }
+                @if (esObjetoInmediato(item)) {
+                  <button class="btn-use-now" (click)="usarObjetoDirecto($event, item)">
+                    ¡USAR!
+                  </button>
+                }
               }
-            }
           </div>
         }
       </div>
@@ -103,6 +101,11 @@
           <div class="side-badge tier-badge">
             <span class="label">TIER</span>
             <span class="value">{{ gameService.currentTier() }}</span>
+          </div>
+        } @else {
+          <div class="side-badge league-badge">
+            <span class="label">LIGA</span>
+            <span class="value">{{ gameService.leagueWins() + 1 }}/4</span>
           </div>
         }
       </div>
