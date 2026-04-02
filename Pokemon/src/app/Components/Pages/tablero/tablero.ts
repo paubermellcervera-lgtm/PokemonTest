@@ -60,23 +60,24 @@ export class Tablero {
 
   private async runEvolutionAnimation() {
     this.evolutionFinished.set(false);
+    this.showEvolvedSprite.set(false);
     this.isEvolutionWhite.set(true);
-    
-    // Intercambio intermitente (flashing)
-    for (let i = 0; i < 12; i++) {
-      this.showEvolvedSprite.update(v => !v);
-      await new Promise(resolve => setTimeout(resolve, 300 - (i * 20))); // Se acelera
+
+    // Flash blanco ciclado sin cambiar imagen
+    for (let i = 0; i < 10; i++) {
+      this.isEvolutionWhite.set(i % 2 === 0);
+      await new Promise(resolve => setTimeout(resolve, 150));
     }
 
-    // Finalizar: Mostrar evolución y quitar filtro blanco
-    this.showEvolvedSprite.set(true);
+    // Finalizar: mostrar evolución y remover filtro blanco
     this.isEvolutionWhite.set(false);
+    this.showEvolvedSprite.set(true);
     this.evolutionFinished.set(true);
 
-    // Esperar un momento para lucir la evolución
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // Aplicar cambios reales en el servicio
+    // Esperar para ver la evolución
+    await new Promise(resolve => setTimeout(resolve, 1800));
+
+    // Aplicar cambios al servicio
     this.gameService.completeEvolution();
     this.evolutionFinished.set(false);
     this.showEvolvedSprite.set(false);
@@ -93,21 +94,33 @@ export class Tablero {
   async activarObjeto(item: Item) {
     if (item.used || this.animatingItem() || this.animatingIndex() !== null) return;
     
-    // Al cambiar o seleccionar cualquier objeto, reseteamos el modo revivir
-    this.isReviveMode.set(false);
+    const esInmediato = this.esObjetoInmediato(item);
+    const estaSeleccionado = this.gameService.selectedItemForBattle()?.id === item.id;
 
-    // Si ya es el activo y se vuelve a pulsar, lo quitamos
-    if (this.gameService.selectedItemForBattle()?.id === item.id) {
-      if (this.esObjetoInmediato(item)) return;
-      this.gameService.selectedItemForBattle.set(null);
+    // Si es inmediato, seleccionado y el usuario hace click de nuevo → usar
+    if (esInmediato && estaSeleccionado) {
+      await this.ejecutarAnimacionObjeto(item);
+      await this.usarObjetoDirecto(new Event('click'), item);
       return;
     }
 
-    // Reproducir SIEMPRE la animación informativa al seleccionar
-    await this.ejecutarAnimacionObjeto(item);
-    
-    // Marcar como seleccionado
-    this.gameService.useItem(item);
+    // Si es inmediato y no seleccionado → mostrar animación + seleccionar
+    if (esInmediato && !estaSeleccionado) {
+      this.isReviveMode.set(false);
+      await this.ejecutarAnimacionObjeto(item);
+      this.gameService.useItem(item);
+      return;
+    }
+
+    // Para items NO inmediatos: alternar selección o deseleccionar
+    this.isReviveMode.set(false);
+
+    if (estaSeleccionado) {
+      this.gameService.selectedItemForBattle.set(null);
+    } else {
+      await this.ejecutarAnimacionObjeto(item);
+      this.gameService.useItem(item);
+    }
   }
 
   async usarObjetoDirecto(event: Event, item: Item) {
@@ -123,6 +136,8 @@ export class Tablero {
       }
     }
 
+    this.animatingItem.set(null);
+
     if (item.effect === 'instant-win') {
       await this.gameService.applyInstantWin();
     } else if (item.effect === 'tier-boost') {
@@ -135,7 +150,6 @@ export class Tablero {
       await this.gameService.reviveAllPokemon();
     } else if (item.effect === 'revive-one') {
       this.isReviveMode.set(true);
-      // No consumimos el objeto aquí, se consume en seleccionarParaBatalla/handlePokemonClick
     } else if (item.effect === 'reroll-stat') {
       await this.gameService.rerollStat();
     }
@@ -355,5 +369,5 @@ export class Tablero {
   Chetos2() {
     this.gameService.leagueWins.set(4);
   }
-  
+
 }

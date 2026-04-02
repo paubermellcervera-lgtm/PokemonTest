@@ -165,21 +165,13 @@
       <div class="team-slots">
         @for (slot of [0, 1, 2]; track slot) {
           <div class="slot-container" [class.combat-focus]="animatingIndex() === slot">
-            
-            @if (esFaseSeleccion && rerolls[slot] === 3) {
-              <div class="initial-pokeball-container" (click)="reroll(slot)">
-                <img src="/img/poke-ball.png" alt="Generar" class="pokeball-reveal">
-                <span class="pokeball-hint">¡Pulsa para elegir!</span>
-              </div>
-            }
 
             @if (gameService.isEvolving()) {
               <div class="evolution-sprite-container" [class.white-filter]="isEvolutionWhite()">
-                @if (showEvolvedSprite()) {
-                  <img [src]="equipoEvolucionado[slot].image" class="evo-img">
-                } @else {
-                  <img [src]="miEquipo[slot]?.image" class="evo-img">
-                }
+                <img
+                  [src]="showEvolvedSprite() ? equipoEvolucionado[slot]?.image : miEquipo[slot]?.image"
+                  class="evo-img"
+                >
                 @if (evolutionFinished()) { <div class="glow-effect"></div> }
               </div>
             } @else {
@@ -187,10 +179,10 @@
                 [pokemon]="miEquipo[slot] || null"
                 [isLoading]="gameService.loadingSlots()[slot]"
                 [showOnlyStatId]="esFaseSeleccion ? null : estadisticaSeleccionada"
-                (click)="seleccionarParaBatalla(slot)"
-                [class.selectable]="(!esFaseSeleccion && miEquipo[slot] && !miEquipo[slot]!.isFainted && (!esLiga || selectedRivalIndex() !== null)) || (isReviveMode() && miEquipo[slot]?.isFainted)"
+                [isInitial]="esFaseSeleccion && rerolls[slot] === 3"
+                (click)="esFaseSeleccion && rerolls[slot] === 3 ? reroll(slot) : seleccionarParaBatalla(slot)"
+                [class.selectable]="(!esFaseSeleccion && miEquipo[slot] && !miEquipo[slot]!.isFainted && (!esLiga || selectedRivalIndex() !== null)) || (isReviveMode() && miEquipo[slot]?.isFainted) || (esFaseSeleccion && rerolls[slot] === 3)"
                 [class.fainted]="miEquipo[slot]?.isFainted"
-                [class.hidden-card]="esFaseSeleccion && rerolls[slot] === 3"
                 [revealed]="animatingIndex() === slot"
                 [multiplier]="animatingIndex() === slot && showMultiplier() ? currentMultiplierWithBonus() : 1"
               ></app-carta-pokemon>

@@ -1,4 +1,8 @@
-<div class="card-container" [class.fainted]="pokemon()?.isFainted" [class.loading]="isLoading()" [class.revealing]="revealed()">
+<div class="card-container" 
+     [class.fainted]="pokemon()?.isFainted" 
+     [class.loading]="isLoading()" 
+     [class.revealing]="revealed()"
+     [class.initial]="isInitial()">
   
   @if (isLoading()) {
     <div class="spinner-overlay">
@@ -50,6 +54,11 @@
           }
         }
       </ul>
+    </div>
+  } @else if (isInitial()) {
+    <div class="initial-pokeball-content">
+      <img src="/img/poke-ball.png" alt="Generar" class="pokeball-reveal">
+      <span class="pokeball-hint">¡Pulsa para elegir!</span>
     </div>
   } @else if (!isLoading()) {
     <div class="empty-slot">

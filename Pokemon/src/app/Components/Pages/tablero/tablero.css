@@ -166,15 +166,15 @@
   gap: 1rem;
   margin: 0.25rem 0;
   position: relative;
-  z-index: 100; /* por debajo de cartas */
+  z-index: 400; /* Por encima de todo durante la batalla */
   transition: transform 0.3s ease;
 }
 
 .battle-area.animating .central-battle-zone {
   opacity: 1;
   filter: none;
-  transform: scale(1.05);
-  /* Slight pop for stats */
+  transform: scale(1.1); /* Un poco más grande para destacar */
+  z-index: 500;
 }
 
 .battle-divider {
@@ -264,7 +264,7 @@
   gap: 1rem;
   width: 100%;
   max-width: 60rem;
-  align-items: start; /* Evita que los slots se centren si tienen alturas distintas */
+  align-items: stretch; /* Estira todos los slots para que midan lo mismo */
 }
 
 .opponent-side,
@@ -345,24 +345,6 @@
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-}
-
-.initial-pokeball-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 50;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(4px);
-  border-radius: 0.5rem;
-  border: 2px dashed rgba(255, 255, 255, 0.5);
 }
 
 .pokeball-reveal {
@@ -783,10 +765,10 @@
   }
 
   100% {
-    transform: translateY(2vh) scale(1.08);
+    transform: translateY(-1.5vh) scale(1.08);
   }
 
-  /* Subtle scaling and lunge */
+  /* Moves slightly UP (away from center) to avoid overlap */
 }
  
 .hidden-card {
@@ -822,6 +804,27 @@
 .battle-area.animating .side-info {
   opacity: 0;
   transition: opacity 0.3s ease;
+}
+
+/* --- EFECTO DE ENFOQUE EN COMBATE (BLUR Y ESCALADO) --- */
+/* Desenfocar y encoger cartas del jugador no activas */
+.battle-area.animating .slot-container:not(.combat-focus),
+/* Desenfocar y encoger rivales de la liga no activos */
+.battle-area.animating .rival-slot:not(.combat-focus),
+/* En modo normal, si el lado del oponente no tiene foco (raro pero por seguridad) */
+.battle-area.animating .opponent-side:not(.combat-focus) {
+  filter: blur(5px) grayscale(0.3);
+  transform: scale(0.85);
+  opacity: 0.5;
+  pointer-events: none;
+  transition: all 0.5s ease;
+}
+
+/* Asegurar que las cartas con foco se vean nítidas y grandes */
+.battle-area.animating .combat-focus {
+  filter: none !important;
+  opacity: 1 !important;
+  z-index: 100 !important;
 }
 
 /* --- MODALES (GAME OVER, VICTORIA, CAMBIO) --- */
@@ -927,4 +930,68 @@
   bottom: 1rem;
   right: 1rem;
   opacity: 0.5;
+}
+
+/* --- EVOLUCIÓN ANIMACIÓN --- */
+.evolution-sprite-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1rem;
+  overflow: hidden;
+  transition: background-color 0.18s ease-in-out;
+}
+
+.evolution-sprite-container.white-filter {
+  background: rgba(255, 255, 255, 0.85);
+  animation: evolution-flash 0.18s ease-in-out infinite alternate;
+}
+
+.evo-img {
+  width: 85%;
+  height: 85%;
+  object-fit: contain;
+  image-rendering: pixelated;
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.4);
+  animation: evolution-pop-in 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  border-radius: 0.5rem;
+}
+
+.glow-effect {
+  position: absolute;
+  inset: 0;
+  border-radius: 1rem;
+  box-shadow: 0 0 2rem 0.5rem rgba(241, 196, 15, 0.8);
+  animation: glow-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes evolution-flash {
+  0% { background: rgba(255, 255, 255, 0.95); }
+  100% { background: rgba(255, 255, 255, 0.3); }
+}
+
+@keyframes evolution-pop-in {
+  0% {
+    transform: scale(0.85) rotate(-5deg);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.1) rotate(2deg);
+  }
+  100% {
+    transform: scale(1) rotate(0);
+    opacity: 1;
+  }
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 1.5rem 0.3rem rgba(241, 196, 15, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 2.5rem 0.6rem rgba(241, 196, 15, 1);
+  }
 }

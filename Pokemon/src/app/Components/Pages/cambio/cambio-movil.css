@@ -1,80 +1,105 @@
-/* CAMBIO MOVIL */
+/* CAMBIO MOVIL - AJUSTES PARA UNA SOLA PANTALLA CON TEXTO LEGIBLE */
 
 .cambio-container {
-  padding: 0.25rem 1rem !important;
-  gap: 0.2rem !important;
-  justify-content: flex-start;
+  padding: 0.1rem 0.5rem !important;
+  gap: 0 !important;
+  height: 100vh !important;
+  overflow: hidden !important;
+  justify-content: space-evenly !important;
 }
 
 .header {
-  padding: 0.5rem 1rem;
+  padding: 0.3rem 0.8rem !important;
   max-width: 95%;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.05rem !important;
+  border-radius: 10px !important;
 }
 
 .header h1 {
-  font-size: 1.1rem;
-  margin-bottom: 0.1rem;
+  font-size: 1rem !important;
+  margin-bottom: 0 !important;
 }
 
 .header p {
-  font-size: 0.75rem;
+  font-size: 0.7rem !important;
 }
 
 .exchange-area {
-  flex-direction: column;
-  gap: 0.5rem;
-  width: 100%;
+  flex-direction: column !important;
+  gap: 0.1rem !important;
+  width: 100% !important;
 }
 
 .prize-section h3, .team-section h3 {
-  font-size: 0.8rem;
-  margin-bottom: 0.25rem;
-  padding: 0.2rem 0.5rem;
+  font-size: 0.8rem !important;
+  margin-bottom: 0.05rem !important;
+  padding: 0.1rem 0.4rem !important;
 }
 
 .prize-section app-carta-pokemon {
-  max-width: 9rem; /* Carta más pequeña para el premio */
+  max-width: 7.5rem !important; 
+}
+
+/* Forzar tamaño de carta en intercambio móvil */
+::ng-deep .cambio-container app-carta-pokemon .card-container {
+  min-height: 7.5rem !important;
+  padding: 0.15rem !important;
+}
+
+::ng-deep .cambio-container app-carta-pokemon .pokemon-image img {
+  max-height: 3.2rem !important; /* Reducido para dar espacio al texto */
+}
+
+::ng-deep .cambio-container app-carta-pokemon .pokemon-info h3 {
+  font-size: 0.7rem !important;
+  margin: 0.1rem 0 !important;
+}
+
+::ng-deep .cambio-container app-carta-pokemon .type-badge {
+  padding: 0.1rem 0.2rem !important;
+  font-size: 0.45rem !important;
+}
+
+::ng-deep .cambio-container app-carta-pokemon .stat-item {
+  font-size: 0.65rem !important; /* Más legible */
+  gap: 0.2rem !important;
 }
 
 .divider {
-  margin: 0.1rem 0;
+  margin: 0 !important;
+  height: 1.2rem !important;
 }
 
 .vs {
-  font-size: 1rem;
-  padding: 3px 8px;
+  font-size: 0.9rem !important;
+  padding: 2px 8px !important;
 }
 
 .team-grid {
   display: grid !important;
-  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-  gap: 0.1rem !important;
-  width: 100%;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 0.2rem !important;
+  width: 100% !important;
+  padding: 0 0.2rem !important;
 }
 
 .team-section p {
-  font-size: 0.65rem;
-  margin-bottom: 0.25rem;
+  font-size: 0.65rem !important;
+  margin-bottom: 0.05rem !important;
 }
 
 .slot-container {
-  width: 100%;
+  width: 100% !important;
 }
 
-.replace-overlay {
-  font-size: 0.7rem;
-}
-
-.fainted-overlay {
-  font-size: 0.7rem;
+.replace-overlay, .fainted-overlay {
+  font-size: 0.6rem !important;
 }
 
 .btn-cancel {
-  padding: 0.5rem 1.5rem;
-  font-size: 0.85rem;
-  margin-top: 1rem;
-  margin-bottom: 2rem;
-  z-index: 100;
-  position: relative;
+  padding: 0.5rem 1.2rem !important;
+  font-size: 0.8rem !important;
+  margin-top: 0.1rem !important;
+  margin-bottom: 0.3rem !important;
+  border-radius: 20px !important;
 }

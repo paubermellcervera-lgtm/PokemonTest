@@ -16,6 +16,7 @@ export class CartaPokemon {
   isLoading = input<boolean>(false);
   revealed = input<boolean>(false); 
   multiplier = input<number>(1);
+  isInitial = input<boolean>(false);
 
   displayValues = signal<{ [key: string]: number }>({});
   private currentMultiplierValue = 1;
