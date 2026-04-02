@@ -107,3 +107,22 @@
 .item-name {
   font-size: 0.4rem !important;
 }
+
+/* --- MODALES MÓVIL --- */
+.game-over-modal {
+  padding: 1rem !important;
+}
+
+.game-over-modal h2 {
+  font-size: 1.8rem !important;
+}
+
+.winner-img {
+  width: 4.5rem !important;
+  height: 4.5rem !important;
+}
+
+.final-team {
+  gap: 0.5rem !important;
+  margin: 1rem 0 !important;
+}

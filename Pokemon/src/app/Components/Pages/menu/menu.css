@@ -152,7 +152,8 @@ button:active {
   background: white;
   padding: 2.5rem;
   border-radius: 1.25rem;
-  max-width: 31.25rem;
+  width: 90%;
+  max-width: 35rem;
   text-align: center;
   box-shadow: 0 0.625rem 1.875rem rgba(0,0,0,0.5);
   border: 0.25rem solid #3498db;
@@ -161,10 +162,117 @@ button:active {
 .modal-content h2 {
   color: #2980b9;
   margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 2rem;
 }
 
-.modal-content p {
-  text-align: left;
-  line-height: 1.6;
-  color: #34495e;
+/* Carousel styles */
+.carousel-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.carousel-slide {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.image-wrapper {
+  width: 100%;
+  height: 250px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  background: #f0f3f5;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  border: 2px dashed #bdc3c7;
+}
+
+.carousel-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.carousel-text {
+  font-size: 1.3rem;
+  color: #2c3e50;
+  font-weight: 600;
+  text-align: center;
+  margin: 0 0 2rem 0;
+  min-height: 3.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.4;
+}
+
+.carousel-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 1rem;
+}
+
+.nav-btn {
+  background: #3498db;
+  color: white;
+  border: none;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.2s ease;
+  padding: 0;
+  flex-shrink: 0;
+  box-shadow: 0 0.25rem 0 #2980b9;
+}
+
+.nav-btn:hover {
+  background: #2980b9;
+  transform: translateY(-2px);
+  box-shadow: 0 0.35rem 0 #21618c;
+}
+
+.nav-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 0.1rem 0 #21618c;
+}
+
+.indicators {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #bdc3c7;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dot.active {
+  background: #3498db;
+  transform: scale(1.3);
+  box-shadow: 0 0 8px rgba(52, 152, 219, 0.5);
+}
+
+.close-btn {
+  margin-top: 1rem;
+  max-width: 10rem;
 }

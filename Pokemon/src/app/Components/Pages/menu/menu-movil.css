@@ -20,13 +20,32 @@ button {
 .modal-content {
   padding: 1.5rem;
   max-width: 90%;
+  width: 90%;
 }
 
 .modal-content h2 {
-  font-size: 1.1rem;
+  font-size: 1.5rem;
 }
 
-.modal-content p {
-  font-size: 0.75rem;
-  line-height: 1.4;
+.image-wrapper {
+  height: 180px;
+  margin-bottom: 1rem;
 }
+
+.carousel-text {
+  font-size: 1rem;
+  min-height: 3rem;
+  margin-bottom: 1rem;
+}
+
+.nav-btn {
+  width: 35px;
+  height: 35px;
+  font-size: 1rem;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+}
+

@@ -19,13 +19,27 @@
     <div class="modal">
       <div class="modal-content">
         <h2>¿Cómo jugar?</h2>
-        <p>1. Empiezas con 3 Pokémon de Tier 1.</p>
-        <p>2. En cada batalla, se elige una estadística al azar (Ataque, Defensa, etc.).</p>
-        <p>3. El Pokémon con el valor más alto en esa estadística gana.</p>
-        <p>4. Ten en cuenta que tipo es cada Pokémon.</p>
-        <p>5. Gana 10 batallas para que tu equipo evolucione.</p>
-        <p>5. Si todos tus Pokémon se debilitan, ¡el juego termina!</p>
-        <button class="btn-danger" (click)="toggleHowToPlay()">Cerrar</button>
+        
+        <div class="carousel-container">
+          <div class="carousel-slide">
+            <div class="image-wrapper">
+              <img [src]="slides[currentSlide()].image" alt="Cómo jugar" class="carousel-img">
+            </div>
+            <p class="carousel-text">{{ slides[currentSlide()].text }}</p>
+          </div>
+
+          <div class="carousel-controls">
+            <button class="nav-btn" (click)="prevSlide()">❮</button>
+            <div class="indicators">
+              @for (slide of slides; track $index) {
+                <span class="dot" [class.active]="$index === currentSlide()" (click)="currentSlide.set($index)"></span>
+              }
+            </div>
+            <button class="nav-btn" (click)="nextSlide()">❯</button>
+          </div>
+        </div>
+
+        <button class="btn-danger close-btn" (click)="toggleHowToPlay()">Cerrar</button>
       </div>
     </div>
   }

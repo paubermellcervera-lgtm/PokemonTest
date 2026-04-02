@@ -108,6 +108,8 @@ export class GameService {
   readonly isLeaguePhase = signal<boolean>(false);
   readonly leagueWins = signal<number>(0);
   readonly opponentTeam = signal<(Pokemon | null)[]>([null, null, null]);
+  readonly isExchangePhase = signal<boolean>(false);
+  readonly showLeagueAnnouncement = signal<boolean>(false);
 
   readonly volume = signal<number>(0.1);
 
@@ -151,6 +153,8 @@ export class GameService {
   }
 
   readonly loadingSlots = signal<boolean[]>([false, false, false]);
+  readonly loadingOpponent = signal<boolean>(false);
+  readonly loadingLeagueSlots = signal<boolean[]>([false, false, false]);
 
   async generatePokemonForSlot(index: number) {
     const currentRerolls = this.rerolls();
@@ -223,17 +227,22 @@ export class GameService {
   }
 
   async spawnOpponent() {
-    let rival: Pokemon;
-    let isDuplicate = true;
+    this.loadingOpponent.set(true);
+    try {
+      let rival: Pokemon;
+      let isDuplicate = true;
 
-    do {
-      rival = await this.pokemonService.getRandomPokemonByTier(this.currentTier());
-      isDuplicate = this.team().some(p => p?.id === rival.id);
-    } while (isDuplicate);
+      do {
+        rival = await this.pokemonService.getRandomPokemonByTier(this.currentTier());
+        isDuplicate = this.team().some(p => p?.id === rival.id);
+      } while (isDuplicate);
 
-    this.opponent.set(rival);
-    this.generateRandomStat();
-    if (rival.cry) this.playCry(rival.cry);
+      this.opponent.set(rival);
+      this.generateRandomStat();
+      if (rival.cry) this.playCry(rival.cry);
+    } finally {
+      this.loadingOpponent.set(false);
+    }
   }
 
   playCry(url: string) {
@@ -416,7 +425,7 @@ export class GameService {
           await this.startLeague();
         } else {
          this.defeatedOpponent.set(this.opponent());
-          this.router.navigate(['/cambio']);
+         this.router.navigate(['/cambio']);
         }
      }
 
@@ -426,24 +435,32 @@ export class GameService {
     // Curamos al equipo para la liga
     this.team.update(t => t.map(p => p ? { ...p, isFainted: false } : null));
     await this.spawnLeagueOpponents();
+    this.showLeagueAnnouncement.set(true);
     this.router.navigate(['/tablero']);
   }
 
   async spawnLeagueOpponents() {
-    const enemies: Pokemon[] = [];
-    const usedIds = new Set<number>();
+    this.loadingLeagueSlots.set([true, true, true]);
+    try {
+      const enemies: Pokemon[] = [];
+      const usedIds = new Set<number>();
 
-    for (let i = 0; i < 3; i++) {
-      let p: Pokemon;
-      do {
-        p = await this.pokemonService.getRandomPokemonByTier(3);
-      } while (usedIds.has(p.id) || this.team().some(tp => tp?.id === p.id));
-      
-      enemies.push({ ...p, isFainted: false });
-      usedIds.add(p.id);
+      for (let i = 0; i < 3; i++) {
+        let p: Pokemon;
+        do {
+          p = await this.pokemonService.getRandomPokemonByTier(3);
+        } while (usedIds.has(p.id) || this.team().some(tp => tp?.id === p.id));
+        
+        enemies.push({ ...p, isFainted: false });
+        usedIds.add(p.id);
+        
+        // Simular carga progresiva si se quiere, pero aquí cargamos todo
+      }
+      this.opponentTeam.set(enemies);
+      this.generateRandomStat();
+    } finally {
+      this.loadingLeagueSlots.set([false, false, false]);
     }
-    this.opponentTeam.set(enemies);
-    this.generateRandomStat();
   }
 
   // --- LIGA POKEMON ---
@@ -577,6 +594,7 @@ export class GameService {
     }
     this.defeatedOpponent.set(null);
     this.isForcedCapture.set(false);
+    this.isExchangePhase.set(false);
     if (this.canEvolve()) {
       await this.prepareEvolution();
     } else {

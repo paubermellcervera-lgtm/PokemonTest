@@ -1,3 +1,4 @@
+  
 <div class="tablero-container">
   
   <!-- BOTÓN VOLVER (SOLO EL BOTÓN A LA IZQUIERDA) -->
@@ -76,6 +77,7 @@
               <app-carta-pokemon 
                 [pokemon]="rival" 
                 [hideStats]="true"
+                [isLoading]="gameService.loadingLeagueSlots()[$index]"
                 [revealed]="animatingRivalIndex() === $index && revealRivalStat()"
                 [showOnlyStatId]="estadisticaSeleccionada"
               ></app-carta-pokemon>
@@ -83,10 +85,11 @@
           }
         </div>
       } @else {
-        @if (pokemonRival) {
+        @if (pokemonRival || gameService.loadingOpponent()) {
           <app-carta-pokemon 
             [pokemon]="pokemonRival" 
             [hideStats]="true"
+            [isLoading]="gameService.loadingOpponent()"
             [revealed]="revealRivalStat()"
             [showOnlyStatId]="estadisticaSeleccionada"
           ></app-carta-pokemon>
@@ -147,7 +150,11 @@
       <!-- Lado Derecho: Victorias -->
       <div class="side-info right">
         <div class="side-badge victories-badge">
-          <span class="label">VICTORIAS</span>
+          @if (esEstiloMovil()) {
+            <span class="label">VIC</span>
+          } @else {
+            <span class="label">VICTORIAS</span>
+          }
           <span class="value">{{ gameService.totalVictories() }}</span>
         </div>
       </div>
@@ -218,18 +225,28 @@
       <button routerLink="/menu" class="btn-danger">Volver al Inicio</button>
     </div>
   }
-
-  @if (gameService.isLeagueVictory()) {
-    <div class="game-over-modal victory-modal">
-      <h2>🎉 ¡NUEVO CAMPEÓN! 🎉</h2>
-      <p>Has superado la Liga Pokémon con honor.</p>
-      <div class="final-team">
-        @for (p of miEquipo; track $index) {
-          @if (p) { <img [src]="p.image" class="winner-img"> }
-        }
-      </div>
-      <button (click)="volverAlMenu()" class="btn-success">Volver al Menú Principal</button>
+@if (gameService.isLeagueVictory()) {
+  <div class="game-over-modal victory-modal">
+    <h2>🎉 ¡NUEVO CAMPEÓN! 🎉</h2>
+    <p>Has superado la Liga Pokémon con honor.</p>
+    <div class="final-team">
+      @for (p of miEquipo; track $index) {
+        @if (p) { <img [src]="p.image" class="winner-img"> }
+      }
     </div>
-  }
-</div>
+    <button (click)="volverAlMenu()" class="btn-success">Volver al Menú Principal</button>
+  </div>
+}
+
+@if (gameService.showLeagueAnnouncement()) {
+  <div class="game-over-modal league-announcement-modal">
+    <h2 class="league-title">¡HAS LLEGADO A LA LIGA POKÉMON!</h2>
+    <p class="league-subtitle">Tu equipo ha sido curado por completo.</p>
+    <p class="league-warning">Prepárate para el desafío final.</p>
+    <button (click)="closeLeagueAnnouncement()" class="btn-league-start">¡EMPEZAR!</button>
+  </div>
+}
+</div>  <button (click)="Chetos2()" style="margin-bottom: 3rem;" class="btn-success btn-debug">Chetos2</button>
+
 <button (click)="Chetos()" class="btn-success btn-debug">Chetos</button>
+<br>

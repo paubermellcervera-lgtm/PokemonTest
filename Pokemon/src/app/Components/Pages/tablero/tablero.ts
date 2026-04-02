@@ -7,7 +7,7 @@ import { Item } from '../../../Model/Item';
 
 @Component({
   selector: 'app-tablero',
-  imports: [CartaPokemon, RouterLink],
+  imports: [CartaPokemon, RouterLink,],
   templateUrl: './tablero.html',
   styleUrl: './tablero.css',
 })
@@ -34,6 +34,10 @@ export class Tablero {
   showEvolvedSprite = signal<boolean>(false);
   evolutionFinished = signal<boolean>(false);
 
+  // Detección de estilo móvil
+  isMobileStyle = signal<boolean>(window.matchMedia('(max-width: 768px)').matches);
+  private mobileMediaQuery = window.matchMedia('(max-width: 768px)');
+
   constructor() {
     // Escuchar cuando empieza la evolución
     effect(() => {
@@ -41,6 +45,17 @@ export class Tablero {
         this.runEvolutionAnimation();
       }
     });
+
+    // Actualizar estado cuando el tamaño cambia
+    const onChange = (event: MediaQueryListEvent) => {
+      this.isMobileStyle.set(event.matches);
+    };
+
+    if (this.mobileMediaQuery.addEventListener) {
+      this.mobileMediaQuery.addEventListener('change', onChange);
+    } else {
+      this.mobileMediaQuery.addListener(onChange);
+    }
   }
 
   private async runEvolutionAnimation() {
@@ -136,9 +151,17 @@ export class Tablero {
     return ['instant-win', 'tier-boost', 'opponent-reroll', 'capture', 'revive-all', 'revive-one', 'reroll-stat'].includes(item.effect);
   }
 
+  esEstiloMovil(): boolean {
+    return this.isMobileStyle();
+  }
+
   async volverAlMenu() {
     await this.gameService.initGame();
     this.router.navigate(['/menu']);
+  }
+
+  closeLeagueAnnouncement() {
+    this.gameService.showLeagueAnnouncement.set(false);
   }
 
   get pokemonRival() {
@@ -329,5 +352,8 @@ export class Tablero {
   Chetos() {
     this.gameService.totalVictories.set(40);
   }
-
+  Chetos2() {
+    this.gameService.leagueWins.set(4);
+  }
+  
 }
