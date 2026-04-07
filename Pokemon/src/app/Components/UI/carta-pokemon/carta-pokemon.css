@@ -342,8 +342,104 @@
   
 }
 
-/* Media Queries para comportamiento responsivo automático si no se especifica viewMode */
-@media (max-width: 768px) {
-  /* Si no se fuerza viewMode, por defecto en móvil se ve pequeño pero con el layout de carta */
-  /* El componente 'row' está pensado para ser activado explícitamente en el equipo */
+/* Reroll Tab */
+.reroll-tab {
+  position: absolute;
+  bottom: 0.5rem;
+  right: -0.8rem;
+  background-color: #2ecc71;
+  border: 0.15rem solid #333;
+  border-radius: 2rem 0.5rem 0.5rem 2rem;
+  padding: 0.3rem 0.5rem 0.3rem 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  box-shadow: 0 0.2rem 0 #27ae60;
+  transition: all 0.1s ease;
+  z-index: 20;
+}
+
+.reroll-tab:hover {
+  transform: translateX(0.2rem);
+}
+
+.reroll-tab:active {
+  transform: translateX(0.2rem) scale(0.95);
+  box-shadow: none;
+}
+
+.reroll-tab:active::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: white;
+  opacity: 0.4;
+  border-radius: inherit;
+  animation: flash 0.1s ease-out;
+}
+
+@keyframes flash {
+  from { opacity: 0.4; }
+  to { opacity: 0; }
+}
+
+.reroll-tab.exhausted {
+  background-color: #7f8c8d;
+  box-shadow: 0 0.2rem 0 #2c3e50;
+  cursor: not-allowed;
+}
+
+.reroll-tab.exhausted .pokeball-reroll {
+  filter: grayscale(1);
+}
+
+.reroll-icon-wrapper {
+  position: relative;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pokeball-reroll {
+  image-rendering: pixelated;
+  z-index: 2;
+}
+
+.reroll-arrow {
+  position: absolute;
+  top: -0.2rem;
+  left: -0.2rem;
+  right: -0.2rem;
+  bottom: -0.2rem;
+  border: 0.15rem solid white;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: rotate 2s linear infinite;
+  opacity: 0.8;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.reroll-badge {
+  background-color: white;
+  color: #333;
+  font-size: 0.5rem;
+  font-weight: bold;
+  padding: 0.1rem 0.3rem;
+  border-radius: 1rem;
+  border: 0.1rem solid #333;
+  min-width: 0.8rem;
+  text-align: center;
+}
+
+.container.row .reroll-tab {
+  right: -0.5rem;
+  bottom: 0.3rem;
+  transform: scale(0.8);
 }

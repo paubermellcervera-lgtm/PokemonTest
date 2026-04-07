@@ -1,4 +1,4 @@
-import { Component, input, signal, effect, computed } from '@angular/core';
+import { Component, input, signal, effect, computed, output } from '@angular/core';
 import { TitleCasePipe, NgOptimizedImage } from '@angular/common';
 import { Pokemon, ALL_STATS } from '../../../Model/Pokemon';
 import { getTypeIconUrl, TYPE_COLORS } from '../../../Utils/type-effectiveness';
@@ -19,7 +19,10 @@ export class CartaPokemon {
   isInitial = input<boolean>(false);
   isLeader = input<boolean>(false);
   actionText = input<string | null>(null);
+  rerollCount = input<number | null>(null);
   viewModeInput = input<'card' | 'row' | 'auto'>('auto', { alias: 'viewMode' });
+
+  rerollClick = output<void>();
 
   private windowWidth = signal(window.innerWidth);
 

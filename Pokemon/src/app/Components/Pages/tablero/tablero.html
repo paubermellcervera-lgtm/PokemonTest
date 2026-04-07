@@ -196,21 +196,14 @@
                 [isInitial]="esFaseSeleccion && rerolls[slot] === 3"
                 [isLeader]="leaderIndex() === slot"
                 [actionText]="getActionText(slot)"
-                (click)="esFaseSeleccion && rerolls[slot] === 3 ? reroll(slot) : seleccionarParaBatalla(slot)"
-                [class.selectable]="(!esFaseSeleccion && miEquipo[slot] && !miEquipo[slot]!.isFainted && (!esLiga || selectedRivalIndex() !== null)) || (isReviveMode() && miEquipo[slot]?.isFainted) || (esFaseSeleccion && rerolls[slot] === 3)"
+                [rerollCount]="esFaseSeleccion && rerolls[slot] < 3 ? rerolls[slot] : null"
+                (rerollClick)="reroll(slot)"
+                (click)="esFaseSeleccion ? reroll(slot) : seleccionarParaBatalla(slot)"
+                [class.selectable]="(!esFaseSeleccion && miEquipo[slot] && !miEquipo[slot]!.isFainted && (!esLiga || selectedRivalIndex() !== null)) || (isReviveMode() && miEquipo[slot]?.isFainted) || (esFaseSeleccion && rerolls[slot] > 0)"
                 [class.fainted]="miEquipo[slot]?.isFainted"
                 [revealed]="animatingIndex() === slot"
                 [multiplier]="animatingIndex() === slot && showMultiplier() ? currentMultiplierWithBonus() : 1"
               ></app-carta-pokemon>
-            }
-
-            @if (esFaseSeleccion && rerolls[slot] < 3) {
-              <div class="reroll-controls-below">
-                <button (click)="reroll(slot)" [disabled]="rerolls[slot] === 0 || gameService.isRerollSlotCooldown()[slot]" class="btn-reroll-pokeball">
-                  <img src="/img/poke-ball.png" alt="Reroll" class="pokeball-icon">
-                  <span class="reroll-count">{{ rerolls[slot] }}</span>
-                </button>
-              </div>
             }
           </div>
         }

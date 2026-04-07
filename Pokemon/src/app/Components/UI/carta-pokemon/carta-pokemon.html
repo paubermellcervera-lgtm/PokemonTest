@@ -126,4 +126,16 @@
       <span>?</span>
     </div>
   }
+
+  @if (!isLoading() && rerollCount() !== null) {
+    <div class="reroll-tab" 
+         [class.exhausted]="rerollCount() === 0"
+         (click)="$event.stopPropagation(); rerollClick.emit()">
+      <div class="reroll-icon-wrapper">
+        <img ngSrc="/img/poke-ball.png" width="24" height="24" alt="Reroll" class="pokeball-reroll">
+        <div class="reroll-arrow"></div>
+      </div>
+      <span class="reroll-badge">{{ rerollCount() }}</span>
+    </div>
+  }
 </div>
