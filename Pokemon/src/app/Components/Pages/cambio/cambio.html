@@ -12,9 +12,9 @@
 
   <div class="exchange-area">
     <div class="prize-section">
-      <h3>Pokémon para capturar</h3>
+      <h3>Pokémon derrotado</h3>
       @if (pokemonDerrotado; as p) {
-        <app-carta-pokemon [pokemon]="p"></app-carta-pokemon>
+        <app-carta-pokemon [pokemon]="p" viewMode="card"></app-carta-pokemon>
       }
     </div>
 
@@ -22,37 +22,51 @@
       <span class="vs">POR</span>
     </div>
 
-    <div class="team-section">
+    <div class="team-carousel-section">
       <h3>Tu equipo actual</h3>
       <p>(Los Pokémon debilitados no pueden ser cambiados)</p>
       
-      <div class="team-grid">
-        @for (p of miEquipo; track p?.id; let i = $index) {
+      <div class="carousel-container">
+        <button class="nav-btn prev" (click)="prevSlot()">❮</button>
+        
+        <div class="carousel-card-wrapper">
+          @let p = miEquipo[currentSlotIndex()];
           @if (p) {
-            <div class="slot-container" 
-                 [class.disabled]="p.isFainted"
-                 (click)="!p.isFainted && reemplazar(i)">
-              
-              <app-carta-pokemon [pokemon]="p"></app-carta-pokemon>
-              
-              @if (!p.isFainted) {
-                <div class="replace-overlay">SUSTITUIR</div>
-              } @else {
-                <div class="fainted-overlay">DEBILITADO</div>
+            <div class="slot-card-container" [class.disabled]="p.isFainted">
+              <app-carta-pokemon [pokemon]="p" viewMode="card"></app-carta-pokemon>
+              @if (p.isFainted) {
+                <div class="fainted-label">DEBILITADO</div>
               }
             </div>
+          } @else {
+            <div class="empty-slot-card">VACÍO</div>
           }
+        </div>
+
+        <button class="nav-btn next" (click)="nextSlot()">❯</button>
+      </div>
+
+      <div class="carousel-indicators">
+        @for (dot of [0, 1, 2]; track dot) {
+          <span class="dot" [class.active]="currentSlotIndex() === dot" (click)="currentSlotIndex.set(dot)"></span>
+        }
+      </div>
+
+      <div class="carousel-actions">
+        <button 
+          class="btn-success btn-exchange" 
+          [disabled]="!miEquipo[currentSlotIndex()] || miEquipo[currentSlotIndex()]?.isFainted"
+          (click)="reemplazar(currentSlotIndex())">
+          ¡CAMBIAR!
+        </button>
+        
+        @if (!isForcedCapture) {
+          <button (click)="noCambiar()" class="btn-danger btn-cancel-exchange">
+            CANCELAR
+          </button>
         }
       </div>
     </div>
-  </div>
-
-  <div class="actions">
-    @if (!isForcedCapture) {
-      <button (click)="noCambiar()" class="btn-danger">
-        Cancelar Intercambio
-      </button>
-    }
   </div>
 
 </div>

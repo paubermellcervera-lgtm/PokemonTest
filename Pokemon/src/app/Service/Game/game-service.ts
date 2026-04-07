@@ -140,6 +140,12 @@ export class GameService {
     this.defeatedOpponent.set(null);
     this.evolvedTeamPreview.set([]);
     
+    // Reset Boosts
+    this.isTierBoostActive.set(false);
+    this.boostedTeam.set([null, null, null]);
+    this.boostedOpponent.set(null);
+    this.selectedItemForBattle.set(null);
+
     // Reset Liga
     this.isLeaguePhase.set(false);
     this.leagueWins.set(0);
@@ -411,32 +417,32 @@ export class GameService {
 
   async winBattle() {
     this.isTierBoostActive.set(false);
-        const currentItem = this.selectedItemForBattle(); // Get item first
-       const winIncrement = 1; // Determine increment
+    const winIncrement = 1; 
     
-         if (currentItem) {
-            this.consumeItem(currentItem.id); // Consume it after determining increment
-         }
-             this.victories.update(v => v + winIncrement);
-       this.totalVictories.update(v => v + winIncrement);
-        this.storageService.saveHighScore(this.totalVictories());
-   
-        if (this.totalVictories() >= 30) {
-          await this.startLeague();
-        } else {
-         this.defeatedOpponent.set(this.opponent());
-         this.router.navigate(['/cambio']);
-        }
-     }
+    this.victories.update(v => v + winIncrement);
+    this.totalVictories.update(v => v + winIncrement);
+    this.storageService.saveHighScore(this.totalVictories());
+
+    if (this.totalVictories() >= 30) {
+      await this.startLeague();
+    } else {
+      this.defeatedOpponent.set(this.opponent());
+      this.router.navigate(['/cambio']);
+    }
+  }
 
   async startLeague() {
     this.isLeaguePhase.set(true);
     this.leagueWins.set(0);
-    // Curamos al equipo para la liga
+    // Curamos al equipo para la liga de forma inmediata
     this.team.update(t => t.map(p => p ? { ...p, isFainted: false } : null));
-    await this.spawnLeagueOpponents();
+    
+    // Primero mostramos el anuncio y navegamos para dar feedback inmediato
     this.showLeagueAnnouncement.set(true);
     this.router.navigate(['/tablero']);
+    
+    // Cargamos los rivales en segundo plano mientras el usuario ve el popup
+    await this.spawnLeagueOpponents();
   }
 
   async spawnLeagueOpponents() {

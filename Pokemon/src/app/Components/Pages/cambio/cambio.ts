@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { TitleCasePipe } from '@angular/common';
 import { GameService } from '../../../Service/Game/game-service';
 import { CartaPokemon } from '../../UI/carta-pokemon/carta-pokemon';
@@ -11,6 +11,16 @@ import { CartaPokemon } from '../../UI/carta-pokemon/carta-pokemon';
 })
 export class Cambio {
   readonly gameService: GameService = inject(GameService);
+
+  currentSlotIndex = signal(0);
+
+  prevSlot() {
+    this.currentSlotIndex.update(i => (i > 0 ? i - 1 : 2));
+  }
+
+  nextSlot() {
+    this.currentSlotIndex.update(i => (i < 2 ? i + 1 : 0));
+  }
 
   get pokemonDerrotado() {
     return this.gameService.defeatedOpponent();

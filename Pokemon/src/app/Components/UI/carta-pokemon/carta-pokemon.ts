@@ -1,11 +1,11 @@
 import { Component, input, signal, effect, computed } from '@angular/core';
-import { TitleCasePipe } from '@angular/common';
+import { TitleCasePipe, NgOptimizedImage } from '@angular/common';
 import { Pokemon, ALL_STATS } from '../../../Model/Pokemon';
 import { getTypeIconUrl, TYPE_COLORS } from '../../../Utils/type-effectiveness';
 
 @Component({
   selector: 'app-carta-pokemon',
-  imports: [TitleCasePipe],
+  imports: [TitleCasePipe, NgOptimizedImage],
   templateUrl: './carta-pokemon.html',
   styleUrl: './carta-pokemon.css',
 })
@@ -17,6 +17,17 @@ export class CartaPokemon {
   revealed = input<boolean>(false); 
   multiplier = input<number>(1);
   isInitial = input<boolean>(false);
+  isLeader = input<boolean>(false);
+  actionText = input<string | null>(null);
+  viewModeInput = input<'card' | 'row' | 'auto'>('auto', { alias: 'viewMode' });
+
+  private windowWidth = signal(window.innerWidth);
+
+  viewMode = computed(() => {
+    const inputMode = this.viewModeInput();
+    if (inputMode !== 'auto') return inputMode;
+    return this.windowWidth() < 768 ? 'row' : 'card';
+  });
 
   displayValues = signal<{ [key: string]: number }>({});
   private currentMultiplierValue = 1;
@@ -31,6 +42,10 @@ export class CartaPokemon {
   });
 
   constructor() {
+    window.addEventListener('resize', () => {
+      this.windowWidth.set(window.innerWidth);
+    });
+
     effect(() => {
       const isRev = this.revealed();
       const p = this.pokemon();

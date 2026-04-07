@@ -4,10 +4,33 @@
   padding: 0.1rem 0.3rem !important;
   gap: 0 !important;
   height: 100vh !important;
-  overflow: hidden !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
   display: flex !important;
   flex-direction: column !important;
   justify-content: flex-start !important;
+}
+
+/* Ocultar elementos durante evolución en móvil para evitar scroll */
+.tablero-container:has(.evo-img) h3,
+.tablero-container:has(.evo-img) .items-inventory-container,
+.tablero-container:has(.evo-img) .central-battle-zone,
+.tablero-container:has(.evo-img) .opponent-side {
+  display: none !important;
+}
+
+.tablero-container:has(.evo-img) .player-side {
+  height: 100vh !important;
+  justify-content: center !important;
+}
+
+.tablero-container:has(.evo-img) .team-slots {
+  gap: 2rem !important;
+  padding: 1rem !important;
+}
+
+.tablero-container:has(.evo-img) .evolution-sprite-container {
+  height: 25vh !important;
 }
 
 .header {

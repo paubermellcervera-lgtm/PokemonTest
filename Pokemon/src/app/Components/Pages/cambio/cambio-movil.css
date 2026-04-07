@@ -1,105 +1,103 @@
-/* CAMBIO MOVIL - AJUSTES PARA UNA SOLA PANTALLA CON TEXTO LEGIBLE */
+/* CAMBIO MOVIL - AJUSTES PARA EL NUEVO CARRUSEL */
 
 .cambio-container {
-  padding: 0.1rem 0.5rem !important;
-  gap: 0 !important;
+  padding: 0.5rem !important;
+  gap: 0.5rem !important;
   height: 100vh !important;
-  overflow: hidden !important;
-  justify-content: space-evenly !important;
+  overflow-y: auto !important;
+  justify-content: flex-start !important;
 }
 
 .header {
-  padding: 0.3rem 0.8rem !important;
-  max-width: 95%;
-  margin-bottom: 0.05rem !important;
-  border-radius: 10px !important;
+  padding: 0.5rem !important;
+  max-width: 100%;
+  margin-bottom: 0.5rem !important;
 }
 
 .header h1 {
-  font-size: 1rem !important;
-  margin-bottom: 0 !important;
+  font-size: 0.9rem !important;
 }
 
 .header p {
-  font-size: 0.7rem !important;
+  font-size: 0.6rem !important;
 }
 
 .exchange-area {
   flex-direction: column !important;
-  gap: 0.1rem !important;
+  gap: 1rem !important;
   width: 100% !important;
 }
 
-.prize-section h3, .team-section h3 {
-  font-size: 0.8rem !important;
-  margin-bottom: 0.05rem !important;
-  padding: 0.1rem 0.4rem !important;
+.prize-section, .team-carousel-section {
+  max-width: 100% !important;
+  width: 100% !important;
 }
 
-.prize-section app-carta-pokemon {
-  max-width: 7.5rem !important; 
-}
-
-/* Forzar tamaño de carta en intercambio móvil */
-::ng-deep .cambio-container app-carta-pokemon .card-container {
-  min-height: 7.5rem !important;
-  padding: 0.15rem !important;
-}
-
-::ng-deep .cambio-container app-carta-pokemon .pokemon-image img {
-  max-height: 3.2rem !important; /* Reducido para dar espacio al texto */
-}
-
-::ng-deep .cambio-container app-carta-pokemon .pokemon-info h3 {
+.prize-section h3, .team-carousel-section h3 {
   font-size: 0.7rem !important;
-  margin: 0.1rem 0 !important;
-}
-
-::ng-deep .cambio-container app-carta-pokemon .type-badge {
-  padding: 0.1rem 0.2rem !important;
-  font-size: 0.45rem !important;
-}
-
-::ng-deep .cambio-container app-carta-pokemon .stat-item {
-  font-size: 0.65rem !important; /* Más legible */
-  gap: 0.2rem !important;
+  margin-bottom: 0.5rem !important;
+  padding: 0.3rem !important;
 }
 
 .divider {
-  margin: 0 !important;
-  height: 1.2rem !important;
+  display: none !important; /* Ocultar el "POR" en móvil para ahorrar espacio vertical */
 }
 
-.vs {
-  font-size: 0.9rem !important;
-  padding: 2px 8px !important;
+.carousel-container {
+  gap: 0.5rem !important;
 }
 
-.team-grid {
-  display: grid !important;
-  grid-template-columns: repeat(3, 1fr) !important;
-  gap: 0.2rem !important;
-  width: 100% !important;
-  padding: 0 0.2rem !important;
-}
-
-.team-section p {
-  font-size: 0.65rem !important;
-  margin-bottom: 0.05rem !important;
-}
-
-.slot-container {
-  width: 100% !important;
-}
-
-.replace-overlay, .fainted-overlay {
-  font-size: 0.6rem !important;
-}
-
-.btn-cancel {
-  padding: 0.5rem 1.2rem !important;
+.nav-btn {
+  width: 2.5rem !important;
+  height: 2.5rem !important;
   font-size: 0.8rem !important;
-  margin-top: 0.1rem !important;
-  margin-bottom: 0.3rem !important;
-  border-radius: 20px !important;
+}
+
+.carousel-card-wrapper {
+  max-width: 14rem !important;
+}
+
+/* Forzar que las cartas se vean bien en el carrusel móvil */
+::ng-deep .cambio-container app-carta-pokemon .container.card {
+  min-height: auto !important;
+  padding: 0.3rem !important;
+}
+
+::ng-deep .cambio-container app-carta-pokemon .pokemon-image img {
+  max-height: 5rem !important;
+}
+
+::ng-deep .cambio-container app-carta-pokemon .stats-list {
+  gap: 0.1rem !important;
+}
+
+::ng-deep .cambio-container app-carta-pokemon .stat-item {
+  font-size: 0.55rem !important;
+}
+
+.carousel-indicators {
+  margin: 0.8rem 0 !important;
+  gap: 0.5rem !important;
+}
+
+.dot {
+  width: 0.6rem !important;
+  height: 0.6rem !important;
+}
+
+.carousel-actions {
+  flex-direction: row !important;
+  width: 100% !important;
+  justify-content: center !important;
+}
+
+.btn-exchange, .btn-cancel-exchange {
+  padding: 0.6rem 1rem !important;
+  font-size: 0.65rem !important;
+  flex: 1 !important;
+  max-width: 8rem !important;
+}
+
+.team-carousel-section p {
+  font-size: 0.45rem !important;
 }

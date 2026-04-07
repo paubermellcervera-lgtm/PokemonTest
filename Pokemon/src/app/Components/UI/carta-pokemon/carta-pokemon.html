@@ -1,63 +1,124 @@
-<div class="card-container" 
+<div class="container" 
      [class.fainted]="pokemon()?.isFainted" 
      [class.loading]="isLoading()" 
      [class.revealing]="revealed()"
-     [class.initial]="isInitial()">
+     [class.initial]="isInitial()"
+     [class.leader]="isLeader()"
+     [class]="viewMode()">
   
   @if (isLoading()) {
     <div class="spinner-overlay">
-      <img src="/img/poke-ball.png" alt="Cargando..." class="pokeball-spinner">
+      <img ngSrc="/img/poke-ball.png" width="50" height="50" alt="Cargando..." class="pokeball-spinner">
     </div>
   }
 
   @if (pokemon(); as p) {
-    <div class="pokemon-image">
-      <img [src]="p.image" [alt]="p.name">
-    </div>
-    
-    <div class="pokemon-info">
-      <h3>{{ p.name | titlecase }}</h3>
+    @if (viewMode() === 'card') {
+      <div class="pokemon-image">
+        <img [ngSrc]="p.image" [alt]="p.name" width="120" height="120" priority>
+      </div>
       
-      <div class="types-container">
-        @for (type of p.types; track type) {
-          <div class="type-badge" [style.background-color]="getTypeColor(type)">
-            <img [src]="getTypeIcon(type)" [alt]="type" class="type-icon">
-            <span class="type-name">{{ type | titlecase }}</span>
+      <div class="pokemon-info">
+        <h3>{{ p.name | titlecase }}</h3>
+        
+        <div class="types-container">
+          @for (type of p.types; track type) {
+            <div class="type-badge" [style.background-color]="getTypeColor(type)">
+              <img [ngSrc]="getTypeIcon(type)" [alt]="type" class="type-icon" width="16" height="16">
+              <span class="type-name">{{ type | titlecase }}</span>
+            </div>
+          }
+        </div>
+
+        <ul class="stats-list" [class.single-stat-mode]="showOnlyStatId()">
+          @if (hideStats() && !revealed()) {
+            @for (stat of statsFiltradas(); track stat.name) {
+              <li>
+                <span class="stat-item">
+                  @if (!showOnlyStatId()) {
+                    <span class="stat-name">{{ getStatShorthand(stat.name) }}:</span>
+                  }
+                  <span class="stat-value">???</span>
+                </span>
+              </li>
+            }
+          } @else {
+            @for (stat of statsFiltradas(); track stat.name) {
+              <li>
+                <span class="stat-item">
+                  @if (!showOnlyStatId()) {
+                    <span class="stat-name">{{ getStatShorthand(stat.name) }}:</span>
+                  }
+                  <span class="stat-value">
+                    {{ revealed() ? (displayValues()[stat.name] || 0) : stat.value }}
+                  </span>
+                </span>
+              </li>
+            }
+          }
+        </ul>
+      </div>
+    } @else {
+      <!-- MODO FILA (MOBILE) -->
+      <div class="row-identity">
+        <div class="pokemon-sprite">
+          <img [ngSrc]="p.image" [alt]="p.name" width="80" height="80" priority>
+        </div>
+      </div>
+
+      <div class="row-health">
+        <div class="name-line">
+          <span class="p-name">{{ p.name | titlecase }}</span>
+        </div>
+        
+        @if (!hideStats()) {
+          <div class="hp-container">
+            <div class="hp-bar-bg">
+              <div class="hp-bar-fill" [style.width.%]="p.isFainted ? 0 : 100"></div>
+            </div>
+            <span class="hp-text">HP</span>
+          </div>
+        }
+
+        <div class="row-types">
+          @for (type of p.types; track type) {
+            <div class="type-badge mini" [style.background-color]="getTypeColor(type)">
+              <img [ngSrc]="getTypeIcon(type)" [alt]="type" class="type-icon" width="12" height="12">
+              <span class="type-name">{{ type | titlecase }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="row-power" [class.multi-stat]="!showOnlyStatId()">
+        @if (showOnlyStatId(); as statId) {
+          <div class="stat-display">
+            <span class="stat-label">{{ getStatShorthand(statId) }}</span>
+            <span class="stat-val">
+              @if (hideStats() && !revealed()) {
+                ???
+              } @else {
+                {{ revealed() ? (displayValues()[statId] || 0) : p.stats.find(s => s.name === statId)?.value }}
+              }
+            </span>
+          </div>
+        } @else {
+          <div class="row-stats-grid">
+            @for (stat of p.stats; track stat.name) {
+              <div class="mini-stat">
+                <span class="ms-label">{{ getStatShorthand(stat.name) }}</span>
+                <span class="ms-val">
+                  {{ (hideStats() && !revealed()) ? '???' : stat.value }}
+                </span>
+              </div>
+            }
           </div>
         }
       </div>
-
-      <ul class="stats-list" [class.single-stat-mode]="showOnlyStatId()">
-        @if (hideStats() && !revealed()) {
-          @for (stat of statsFiltradas(); track stat.name) {
-            <li>
-              <span class="stat-item">
-                @if (!showOnlyStatId()) {
-                  <span class="stat-name">{{ getStatShorthand(stat.name) }}:</span>
-                }
-                <span class="stat-value">???</span>
-              </span>
-            </li>
-          }
-        } @else {
-          @for (stat of statsFiltradas(); track stat.name) {
-            <li>
-              <span class="stat-item">
-                @if (!showOnlyStatId()) {
-                  <span class="stat-name">{{ getStatShorthand(stat.name) }}:</span>
-                }
-                <span class="stat-value">
-                  {{ revealed() ? (displayValues()[stat.name] || 0) : stat.value }}
-                </span>
-              </span>
-            </li>
-          }
-        }
-      </ul>
-    </div>
+    }
   } @else if (isInitial()) {
     <div class="initial-pokeball-content">
-      <img src="/img/poke-ball.png" alt="Generar" class="pokeball-reveal">
+      <img ngSrc="/img/poke-ball.png" width="80" height="80" alt="Generar" class="pokeball-reveal">
       <span class="pokeball-hint">¡Pulsa para elegir!</span>
     </div>
   } @else if (!isLoading()) {

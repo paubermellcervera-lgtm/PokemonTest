@@ -63,19 +63,29 @@ export class Tablero {
     this.showEvolvedSprite.set(false);
     this.isEvolutionWhite.set(true);
 
-    // Flash blanco ciclado sin cambiar imagen
-    for (let i = 0; i < 10; i++) {
-      this.isEvolutionWhite.set(i % 2 === 0);
-      await new Promise(resolve => setTimeout(resolve, 150));
+    // Animación de parpadeo alterno (Fiel a la original)
+    // Alterna entre la silueta del pokemon actual y la evolución
+    let delay = 400;
+    const minDelay = 60;
+    const iterations = 25;
+
+    for (let i = 0; i < iterations; i++) {
+      this.showEvolvedSprite.update(v => !v);
+      await new Promise(resolve => setTimeout(resolve, delay));
+      
+      // Acelerar el parpadeo gradualmente
+      if (delay > minDelay) {
+        delay -= (delay * 0.15);
+      }
     }
 
-    // Finalizar: mostrar evolución y remover filtro blanco
+    // Revelación final
     this.isEvolutionWhite.set(false);
     this.showEvolvedSprite.set(true);
     this.evolutionFinished.set(true);
 
-    // Esperar para ver la evolución
-    await new Promise(resolve => setTimeout(resolve, 1800));
+    // Esperar para ver el resultado
+    await new Promise(resolve => setTimeout(resolve, 2500));
 
     // Aplicar cambios al servicio
     this.gameService.completeEvolution();
@@ -94,38 +104,31 @@ export class Tablero {
   async activarObjeto(item: Item) {
     if (item.used || this.animatingItem() || this.animatingIndex() !== null) return;
     
-    const esInmediato = this.esObjetoInmediato(item);
     const estaSeleccionado = this.gameService.selectedItemForBattle()?.id === item.id;
 
-    // Si es inmediato, seleccionado y el usuario hace click de nuevo → usar
-    if (esInmediato && estaSeleccionado) {
-      await this.ejecutarAnimacionObjeto(item);
-      await this.usarObjetoDirecto(new Event('click'), item);
-      return;
-    }
-
-    // Si es inmediato y no seleccionado → mostrar animación + seleccionar
-    if (esInmediato && !estaSeleccionado) {
-      this.isReviveMode.set(false);
-      await this.ejecutarAnimacionObjeto(item);
-      this.gameService.useItem(item);
-      return;
-    }
-
-    // Para items NO inmediatos: alternar selección o deseleccionar
-    this.isReviveMode.set(false);
-
+    // Si ya está seleccionado, deseleccionar
     if (estaSeleccionado) {
       this.gameService.selectedItemForBattle.set(null);
-    } else {
-      await this.ejecutarAnimacionObjeto(item);
-      this.gameService.useItem(item);
+      this.isReviveMode.set(false);
+      return;
     }
+
+    // Reproducir animación siempre al seleccionar (de primeras)
+    await this.ejecutarAnimacionObjeto(item);
+
+    // Seleccionar el objeto
+    this.isReviveMode.set(false);
+    this.gameService.useItem(item);
+  }
+
+  cancelarObjeto() {
+    this.gameService.selectedItemForBattle.set(null);
+    this.isReviveMode.set(false);
   }
 
   async usarObjetoDirecto(event: Event, item: Item) {
     event.stopPropagation();
-    if (item.used || this.animatingIndex() !== null) return;
+    if (item.used || this.animatingIndex() !== null || this.animatingItem()) return;
 
     // Validación: Comprobar si hay algún pokemon derrotado para los objetos de revivir
     if (item.effect === 'revive-all' || item.effect === 'revive-one') {
@@ -136,8 +139,7 @@ export class Tablero {
       }
     }
 
-    this.animatingItem.set(null);
-
+    // Aplicar el efecto directamente (la animación ya se reprodujo al seleccionar)
     if (item.effect === 'instant-win') {
       await this.gameService.applyInstantWin();
     } else if (item.effect === 'tier-boost') {
@@ -157,7 +159,7 @@ export class Tablero {
 
   private async ejecutarAnimacionObjeto(item: Item) {
     this.animatingItem.set(item);
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    await new Promise(resolve => setTimeout(resolve, 2500));
     this.animatingItem.set(null);
   }
 
@@ -198,6 +200,11 @@ export class Tablero {
     return this.gameService.rerolls();
   }
 
+  leaderIndex = computed(() => {
+    const team = this.gameService.team();
+    return team.findIndex(p => p && !p.isFainted);
+  });
+
   get esFaseSeleccion() {
     return this.gameService.isSelectionPhase();
   }
@@ -212,6 +219,21 @@ export class Tablero {
 
   get nombreEstadistica() {
     return this.gameService.selectedStatName();
+  }
+
+  getActionText(index: number): string | null {
+    const pokemon = this.miEquipo[index];
+    if (this.esFaseSeleccion) {
+      return this.rerolls[index] === 3 ? 'ELEGIR' : null;
+    }
+    if (this.isReviveMode()) {
+      return pokemon?.isFainted ? 'REVIVIR' : null;
+    }
+    if (pokemon && !pokemon.isFainted) {
+      if (this.esLiga && this.selectedRivalIndex() === null) return null;
+      return 'LUCHAR';
+    }
+    return null;
   }
 
   seleccionarRival(index: number) {
@@ -318,6 +340,7 @@ export class Tablero {
       case 'opponent-reroll': return 'boost-priority';
       case 'reroll-stat': return 'boost-reroll-stat';
       case 'revive-one': return 'boost-revive';
+      case 'opponent-nerf': return 'boost-med';
       default: return '';
     }
   }
@@ -336,6 +359,7 @@ export class Tablero {
       case 'opponent-reroll': return 'REROLL';
       case 'reroll-stat': return 'REROLL STAT';
       case 'revive-one': return 'REVIVIR';
+      case 'opponent-nerf': return '-30% RIVAL';
       default: return '';
     }
   }

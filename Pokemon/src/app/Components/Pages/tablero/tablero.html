@@ -14,35 +14,6 @@
     </div>
   }
 
-  <!-- ZONA DE OBJETOS -->
-  @if (!esFaseSeleccion && !gameService.isGameOver() && !gameService.isLeagueVictory() && !gameService.isEvolving()) {
-    <div class="items-inventory-container">
-      <div class="items-inventory">
-        @for (item of gameService.items(); track item.id) {
-          <div class="item-slot" 
-               [class.used]="item.used" 
-               [class.active]="gameService.selectedItemForBattle()?.id === item.id"
-               (click)="activarObjeto(item)">
-            <div class="item-icon-container">
-              <img [src]="item.image" [alt]="item.name" class="item-img">
-            </div>
-            <span class="item-name">{{ item.name }}</span>
-              @if (gameService.selectedItemForBattle()?.id === item.id) {
-                @if (!esObjetoInmediato(item)) {
-                  <div class="item-active-badge">ACTIVO</div>
-                }
-                @if (esObjetoInmediato(item)) {
-                  <button class="btn-use-now" (click)="usarObjetoDirecto($event, item)">
-                    ¡USAR!
-                  </button>
-                }
-              }
-          </div>
-        }
-      </div>
-    </div>
-  }
-
   <!-- OVERLAY DE ANIMACIÓN DE OBJETO -->
   @if (animatingItem()) {
     <div class="item-animation-overlay" [class.boost-active]="hasBoost(animatingItem())">
@@ -125,8 +96,14 @@
             <div class="stat-focus"><span class="stat-badge">{{ nombreEstadistica }}</span></div>
             <br>
             @if (!esLiga) {
-              <div class="evolution-progress">Evolución: <strong>{{ gameService.victories() }} / 10</strong></div>
-            } @else {
+              <div class="evolution-container-sidebar">
+                <div class="evolution-progress-text">Evolución: <strong>{{ gameService.victories() }} / 10</strong></div>
+                <div class="evolution-bar-bg">
+                  <div class="evolution-bar-fill" [style.width.%]="(gameService.victories() / 10) * 100"></div>
+                </div>
+              </div>
+            }
+ @else {
               <div class="league-prompt">
                 {{ selectedRivalIndex() === null ? 'Selecciona un rival' : '¡Elige a tu Pokémon!' }}
               </div>
@@ -161,6 +138,43 @@
     </div>
 
     <div class="player-side">
+
+      <!-- ZONA DE OBJETOS -->
+      @if (!esFaseSeleccion && !gameService.isGameOver() && !gameService.isLeagueVictory() && !gameService.isEvolving()) {
+        <div class="items-inventory-container">
+          <div class="items-inventory">
+            @for (item of gameService.items(); track item.id) {
+              <div class="item-slot" 
+                   [class.used]="item.used" 
+                   [class.active]="gameService.selectedItemForBattle()?.id === item.id"
+                   (click)="activarObjeto(item)">
+                <div class="item-icon-container">
+                  <img [src]="item.image" [alt]="item.name" class="item-img">
+                </div>
+                <span class="item-name">{{ item.name }}</span>
+                  @if (gameService.selectedItemForBattle()?.id === item.id) {
+                    @if (!esObjetoInmediato(item)) {
+                      <div class="item-active-badge">ACTIVO</div>
+                      <button class="deselect-btn" (click)="$event.stopPropagation(); cancelarObjeto()">×</button>
+                    }
+                    @if (esObjetoInmediato(item)) {
+                      <div class="item-active-badge">LISTO</div>
+                      <div class="item-actions-direct">
+                        <button class="btn-use-now" (click)="usarObjetoDirecto($event, item)">
+                          ¡USAR!
+                        </button>
+                        <button class="btn-cancel-now" (click)="$event.stopPropagation(); cancelarObjeto()">
+                          CANCELAR
+                        </button>
+                      </div>
+                    }
+                  }
+              </div>
+            }
+          </div>
+        </div>
+      }
+
       <h3>Tu Equipo</h3>
       <div class="team-slots">
         @for (slot of [0, 1, 2]; track slot) {
@@ -180,6 +194,8 @@
                 [isLoading]="gameService.loadingSlots()[slot]"
                 [showOnlyStatId]="esFaseSeleccion ? null : estadisticaSeleccionada"
                 [isInitial]="esFaseSeleccion && rerolls[slot] === 3"
+                [isLeader]="leaderIndex() === slot"
+                [actionText]="getActionText(slot)"
                 (click)="esFaseSeleccion && rerolls[slot] === 3 ? reroll(slot) : seleccionarParaBatalla(slot)"
                 [class.selectable]="(!esFaseSeleccion && miEquipo[slot] && !miEquipo[slot]!.isFainted && (!esLiga || selectedRivalIndex() !== null)) || (isReviveMode() && miEquipo[slot]?.isFainted) || (esFaseSeleccion && rerolls[slot] === 3)"
                 [class.fainted]="miEquipo[slot]?.isFainted"

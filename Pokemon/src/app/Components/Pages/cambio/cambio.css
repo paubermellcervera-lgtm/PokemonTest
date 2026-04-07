@@ -5,8 +5,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
-  padding: 1rem;
+  gap: 1rem;
+  padding: 1.5rem;
   min-height: 100vh;
   width: 100%;
   background-image: url('/img/Fondo Combate.webp');
@@ -15,37 +15,39 @@
   background-repeat: no-repeat;
   background-attachment: fixed;
   text-align: center;
-  font-family: Arial, sans-serif;
+  font-family: 'Press Start 2P', cursive;
   overflow-x: hidden;
   overflow-y: auto;
 }
 
 .header {
   background: rgba(255, 255, 255, 0.9);
-  padding: 1.5rem 3rem;
-  border-radius: 15px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-  max-width: 800px;
+  padding: 1rem 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 0.25rem 1rem rgba(0,0,0,0.2);
+  max-width: 50rem;
+  border: 0.2rem solid #333;
 }
 
 .header h1 {
   color: #27ae60;
-  margin: 0 0 0.5rem 0;
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
 }
 
 .header p {
   color: #333;
-  margin: 0;
-  font-weight: bold;
+  font-size: 0.7rem;
 }
 
 .exchange-area {
   display: flex;
   justify-content: center;
-  align-items: center;
-  gap: 3rem;
+  align-items: flex-start;
+  gap: 2rem;
   width: 100%;
-  max-width: 1200px;
+  max-width: 75rem;
+  margin-top: 1rem;
 }
 
 .prize-section {
@@ -53,146 +55,163 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  max-width: 18rem;
 }
 
-.prize-section app-carta-pokemon {
-  max-width: 250px;
-  border: 4px solid #27ae60;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+.prize-section h3, .team-carousel-section h3 {
+  color: white;
+  text-shadow: 0.1rem 0.1rem 0.2rem rgba(0,0,0,0.8);
+  font-size: 0.8rem;
+  margin-bottom: 0.8rem;
+  background: rgba(0,0,0,0.5);
+  padding: 0.4rem 1rem;
+  border-radius: 0.5rem;
+  width: 100%;
 }
 
 .divider {
   display: flex;
   align-items: center;
-  justify-content: center;
+  padding-top: 10rem;
 }
 
 .vs {
-  font-size: 2.5rem;
-  font-weight: 900;
+  font-size: 1.5rem;
   color: white;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  text-shadow: 0 0.1rem 0.2rem rgba(0,0,0,0.5);
   background: rgba(0,0,0,0.3);
-  padding: 10px 20px;
+  padding: 1rem;
   border-radius: 50%;
 }
 
-.team-section {
-  flex: 2;
+.team-carousel-section {
+  flex: 1.5;
   display: flex;
   flex-direction: column;
   align-items: center;
+  max-width: 25rem;
 }
 
-.team-section h3 {
-  color: white;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-  background: rgba(0,0,0,0.4);
-  padding: 5px 15px;
-  border-radius: 10px;
-}
-
-.team-section p {
+.team-carousel-section p {
   color: #eee;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+  font-size: 0.5rem;
   margin-bottom: 1rem;
 }
 
-.team-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+.carousel-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   gap: 1rem;
-}
-
-.slot-container {
+  width: 100%;
   position: relative;
+}
+
+.carousel-card-wrapper {
+  width: 100%;
+  max-width: 18rem;
+}
+
+.nav-btn {
+  background: #f1c40f;
+  border: 0.2rem solid #333;
+  border-radius: 50%;
+  width: 3rem;
+  height: 3rem;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 1rem;
   cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.slot-container:hover {
-  transform: scale(1.05);
-}
-
-.replace-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(39, 174, 96, 0.8);
-  color: white;
+  box-shadow: 0 0.2rem 0 #d4ac0d;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
-  font-weight: bold;
-  opacity: 0;
-  border-radius: 8px;
-  transition: opacity 0.3s;
+  transition: all 0.2s;
+  z-index: 10;
 }
 
-.slot-container.disabled {
-  cursor: not-allowed;
-  opacity: 0.6;
-  transform: none;
+.nav-btn:hover { background: #f39c12; }
+.nav-btn:active { transform: translateY(0.2rem); box-shadow: none; }
+
+.carousel-indicators {
+  display: flex;
+  gap: 0.8rem;
+  margin: 1.5rem 0;
 }
 
-.fainted-overlay {
+.dot {
+  width: 0.8rem;
+  height: 0.8rem;
+  background: rgba(255,255,255,0.3);
+  border: 0.1rem solid #333;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.dot.active {
+  background: #f1c40f;
+  transform: scale(1.2);
+}
+
+.carousel-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.btn-exchange {
+  padding: 0.8rem 1.5rem !important;
+  font-size: 0.8rem !important;
+  border-radius: 0.5rem !important;
+}
+
+.btn-cancel-exchange {
+  padding: 0.8rem 1.5rem !important;
+  font-size: 0.8rem !important;
+  border-radius: 0.5rem !important;
+}
+
+.slot-card-container {
+  position: relative;
+}
+
+.fainted-label {
   position: absolute;
-  top: 0;
+  top: 50%;
   left: 0;
   right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.4);
-  color: #ff4d4d;
+  transform: translateY(-50%) rotate(-10deg);
+  background: rgba(231, 76, 60, 0.9);
+  color: white;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: bold;
+  pointer-events: none;
+  border: 0.2rem solid white;
+}
+
+.empty-slot-card {
+  height: 20rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
-  font-weight: bold;
-  border-radius: 8px;
+  background: rgba(255,255,255,0.1);
+  border: 0.2rem dashed rgba(255,255,255,0.5);
+  border-radius: 0.5rem;
+  color: #ccc;
+  font-size: 1.5rem;
 }
 
-.slot-container:hover:not(.disabled) .replace-overlay {
-  opacity: 1;
-}
-
-.btn-cancel {
-  background-color: #e74c3c;
-  color: white;
-  border: none;
-  padding: 15px 40px;
-  border-radius: 30px;
-  font-size: 1.2rem;
-  font-weight: bold;
-  cursor: pointer;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-  transition: all 0.3s ease;
-  margin-top: 1rem;
-}
-
-.btn-cancel:hover {
-  background-color: #c0392b;
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
-}
-
-/* Allow cards to expand to show all stats when zoomed */
-::ng-deep .cambio-container app-carta-pokemon .card-container {
-  height: auto !important;
-  min-height: max-content !important;
-  overflow: visible !important;
-}
-
-::ng-deep .cambio-container app-carta-pokemon .pokemon-image img {
-  max-height: 15rem !important;
-}
-
-@media (max-width: 900px) {
+@media (max-width: 1000px) {
   .exchange-area {
     flex-direction: column;
+    align-items: center;
     gap: 1.5rem;
+  }
+  .divider {
+    padding-top: 0;
+    margin: 0.5rem 0;
+  }
+  .vs {
+    padding: 0.5rem 1rem;
   }
 }
