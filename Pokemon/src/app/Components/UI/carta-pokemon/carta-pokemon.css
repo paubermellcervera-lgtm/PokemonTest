@@ -439,7 +439,18 @@
 }
 
 .container.row .reroll-tab {
-  right: -0.5rem;
+  left: -0.5rem;
+  right: auto;
   bottom: 0.3rem;
   transform: scale(0.8);
+  border-radius: 0.5rem 2rem 2rem 0.5rem;
+  padding: 0.3rem 0.8rem 0.3rem 0.5rem;
+}
+
+.container.row .reroll-tab:hover {
+  transform: scale(0.8) translateX(-0.2rem);
+}
+
+.container.row .reroll-tab:active {
+  transform: scale(0.75) translateX(-0.2rem);
 }

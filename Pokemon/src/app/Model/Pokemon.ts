@@ -20,6 +20,7 @@ export interface Pokemon {
   tier: 1 | 2 | 3;
   types: string[];
   stats: Stat[];
+  weight: number;
   isFainted: boolean;
   evolutionChainId: number;
 }

@@ -1,11 +1,11 @@
 import { Component, inject, signal, computed } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { GameService } from '../../../Service/Game/game-service';
 import { StorageService } from '../../../Service/storage-service';
 
 @Component({
   selector: 'app-menu',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './menu.html',
   styleUrl: './menu.css',
 })
@@ -16,9 +16,10 @@ export class Menu {
 
   readonly highScore = this.storageService.highScore;
   readonly hasSavedGame = computed(() => !!this.storageService.getGameState());
+  readonly hasHallOfFame = computed(() => this.storageService.getHallOfFame().length > 0);
   showHowToPlay = signal(false);
   currentSlide = signal(0);
-
+  
   slides = [
     {
       text: 'Elige tu equipo inicial de 3 Pokémon.',
@@ -49,7 +50,7 @@ export class Menu {
       image: '/img/Tier.png'
     }
   ];
-
+  Tutorial = false;
   async iniciarJuego() {
     this.storageService.clearGameState();
     await this.gameService.initGame();

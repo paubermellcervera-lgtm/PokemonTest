@@ -12,7 +12,16 @@
     } @else {
       <button class="btn-primary" (click)="iniciarJuego()">Iniciar Juego</button>
     }
-    <button class="btn-neutral" (click)="toggleHowToPlay()">¿Cómo jugar?</button>
+    @if (Tutorial === false) {
+      <button class="btn-danger-anim" (click)="toggleHowToPlay()" (click)="this.Tutorial = true">¿Cómo jugar?</button>
+    } @else {
+      <button class="btn-neutral" (click)="toggleHowToPlay()">¿Cómo jugar?</button>
+    }
+    @if (hasHallOfFame()) {
+      <button class="btn-Salon_Fama" routerLink="/salon-fama">Salón de la Fama</button>
+    }
+
+
   </div>
 
   @if (showHowToPlay()) {

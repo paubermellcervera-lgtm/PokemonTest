@@ -1,0 +1,411 @@
+.hall-of-fame-container {
+  min-height: 100vh;
+  background: radial-gradient(circle at center, #1a1a1a, #000);
+  color: #fff;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(to bottom, #cc0000, #8b0000);
+  border-bottom: 4px solid #ffcb05;
+  position: relative;
+  z-index: 20;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 2rem;
+  color: #ffcb05;
+  text-shadow: 2px 2px #2a75bb;
+}
+
+.back-btn {
+  position: absolute;
+  left: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 30;
+}
+
+.back-btn img {
+  height: 40px;
+  filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: filter 0.3s;
+  position: relative;
+  gap: 50px;
+}
+
+.content.blurred {
+  filter: blur(5px);
+}
+
+.carousel-container {
+  width: 500px;
+  height: 180px;
+  perspective: 1500px;
+}
+
+.carousel {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.carousel-item {
+  position: absolute;
+  width: 100%;
+  height: 150px;
+  left: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  backface-visibility: visible;
+  opacity: 0;
+  visibility: hidden;
+  filter: grayscale(1) brightness(0.5);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 15px;
+}
+
+.carousel-item.visible-team {
+  opacity: 0.6;
+  visibility: visible;
+  filter: grayscale(0.5) brightness(0.7);
+}
+
+.carousel-item.active-team {
+  opacity: 1;
+  visibility: visible;
+  filter: grayscale(0) brightness(1.2);
+  border: 3px solid #ffcb05;
+  background: rgba(42, 117, 187, 0.3);
+  box-shadow: 0 0 30px rgba(255, 203, 5, 0.4);
+  z-index: 10;
+}
+
+.glow-effect {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: radial-gradient(circle at center, rgba(255,203,5,0.2) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.5s;
+  pointer-events: none;
+}
+
+.active-team .glow-effect {
+  opacity: 1;
+}
+
+.team-row {
+  display: flex;
+  gap: 20px;
+}
+
+.pokemon-sprite {
+  height: 120px;
+  object-fit: contain;
+}
+
+.carousel-navigation {
+  display: flex;
+  flex-direction: column;
+  gap: 150px;
+  z-index: 10;
+}
+
+.nav-arrow {
+  background: rgba(255, 203, 5, 0.8);
+  border: 2px solid #2a75bb;
+  color: #2a75bb;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.5rem;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
+
+.nav-arrow:hover {
+  transform: scale(1.1);
+  background: #ffcb05;
+}
+
+.detail-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.team-details {
+  background: #1e1e1e;
+  padding: 40px;
+  border-radius: 20px;
+  border: 3px solid #ffcb05;
+  position: relative;
+  max-width: 90%;
+  width: 1000px;
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px; right: 15px;
+  background: none; border: none;
+  color: #fff; font-size: 2.5rem;
+  cursor: pointer; z-index: 120;
+}
+
+.cards-wrapper {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+.cards-container {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  width: 100%;
+}
+
+.pokemon-detail-card {
+  flex: 1;
+  background: #2a2a2a;
+  border-radius: 15px;
+  padding: 15px;
+  border: 1px solid #2a75bb;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+}
+
+.p-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.p-number { color: #aaa; font-size: 0.9rem; }
+.p-header h3 { margin: 0; color: #ffcb05; font-size: 1.2rem; }
+.detail-sprite { height: 120px; margin-bottom: 10px; }
+.info {
+  width: 100%;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+
+.types-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.types-row.center {
+  justify-content: center;
+}
+
+.type-icon-wrapper {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.type-icon-wrapper.mini {
+  width: 24px;
+  height: 24px;
+  padding: 4px;
+}
+
+.type-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.radar-chart { width: 100%; height: 200px; }
+
+.evo-btn {
+  margin-top: 15px;
+  background: #2a75bb;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.evo-btn:hover {
+  background: #3c89cf;
+}
+
+.family-overlay {
+  z-index: 200;
+}
+
+.family-details {
+  background: #1a1a1a;
+  padding: 40px;
+  border-radius: 20px;
+  border: 3px solid #2a75bb;
+  max-width: 95%;
+  width: 1200px;
+  text-align: center;
+}
+
+.family-details h2 {
+  color: #ffcb05;
+  margin-bottom: 30px;
+}
+
+.family-cards {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+.pokemon-detail-card.mini {
+  max-width: 350px;
+}
+
+.loading-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 300;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid #ffcb05;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 15px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.empty-msg { text-align: center; padding: 50px; color: #666; }
+
+.mobile-only { display: none; }
+
+@media (max-width: 768px) {
+  .mobile-only { display: flex; }
+  .content { gap: 0; flex-direction: column; }
+  .carousel-container { width: 100%; max-width: 320px; height: 140px; margin-bottom: 120px; }
+  .carousel-item { height: 120px; }
+  .pokemon-sprite { height: 80px; }
+  
+  .carousel-navigation {
+    position: fixed;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    flex-direction: row;
+    justify-content: center;
+    gap: 80px;
+    width: auto;
+    z-index: 150;
+  }
+
+  .nav-arrow {
+    width: 60px;
+    height: 60px;
+    background: #ffcb05;
+    border: 3px solid #2a75bb;
+    color: #2a75bb;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+  }
+
+  .team-details { padding: 20px; width: 95%; }
+  .cards-wrapper { position: relative; overflow: hidden; width: 100%; align-items: center; }
+  .cards-container { gap: 0; transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); justify-content: flex-start; }
+  .pokemon-detail-card { min-width: 100%; opacity: 0.2; transition: opacity 0.3s; }
+  .pokemon-detail-card.active-card { opacity: 1; }
+
+  .mobile-nav-btn {
+    position: absolute;
+    top: 50%; transform: translateY(-50%);
+    background: rgba(42, 117, 187, 0.7);
+    color: white; border: none; padding: 15px 8px;
+    z-index: 130; font-size: 1.2rem; border-radius: 4px;
+  }
+  .mobile-nav-btn.prev { left: 5px; }
+  .mobile-nav-btn.next { right: 5px; }
+  .indicators { display: flex; justify-content: center; gap: 8px; margin-top: 15px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #444; }
+  .dot.active { background: #ffcb05; box-shadow: 0 0 5px #ffcb05; }
+
+  .family-wrapper {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    align-items: center;
+  }
+
+  .family-container {
+    display: flex;
+    gap: 0;
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  .family-container .pokemon-detail-card {
+    min-width: 100%;
+    max-width: 100%;
+    opacity: 0.2;
+    transition: opacity 0.3s;
+  }
+
+  .family-container .pokemon-detail-card.active-card {
+    opacity: 1;
+  }
+
+  .family-details { padding: 20px; }
+}

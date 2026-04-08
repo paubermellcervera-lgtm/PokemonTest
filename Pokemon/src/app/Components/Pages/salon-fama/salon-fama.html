@@ -1,0 +1,147 @@
+<div class="hall-of-fame-container">
+  <div class="header">
+    <button class="back-btn" routerLink="/menu">
+      <img src="img/Flecha atrás.png" alt="Volver">
+    </button>
+    <h1>Salón de la Fama</h1>
+  </div>
+
+  <div class="content" [class.blurred]="selectedTeam() || selectedFamily()">
+    <div class="carousel-container">
+      <div class="carousel" [style.transform]="'rotateX(' + getRotationX() + 'deg)'">
+        @for (team of hallOfFame(); track $index; let i = $index) {
+          <div class="carousel-item" 
+               [class.active-team]="i === currentIndex()"
+               [class.visible-team]="isTeamVisible(i)"
+               [style.transform]="getItemTransform(i)"
+               (click)="selectTeam(team)">
+            <div class="team-row">
+              @for (pokemon of team; track pokemon.id) {
+                <img [src]="pokemon.image" [alt]="pokemon.name" class="pokemon-sprite">
+              }
+            </div>
+            <div class="glow-effect"></div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="carousel-navigation">
+      <button (click)="prevTeam()" class="nav-arrow up">▼</button>
+      <button (click)="nextTeam()" class="nav-arrow down">▲</button>
+    </div>
+  </div>
+
+  @if (selectedTeam(); as team) {
+    <div class="detail-overlay" (click)="closeDetail()">
+      <div class="team-details" (click)="$event.stopPropagation()">
+        <button class="close-btn" (click)="closeDetail()">×</button>
+        
+        <div class="cards-wrapper">
+          <button class="mobile-nav-btn prev mobile-only" (click)="prevCard()">❮</button>
+          
+          <div class="cards-container" [style.transform]="'translateX(' + (-currentCardIndex() * 100) + '%)'">
+            @for (p of team; track p.id; let idx = $index) {
+              <div class="pokemon-detail-card" [class.active-card]="idx === currentCardIndex()">
+                <div class="p-header">
+                  <span class="p-number">#{{ p.id }}</span>
+                  <h3>{{ p.name | uppercase }}</h3>
+                </div>
+                <img [src]="p.image" [alt]="p.name" class="detail-sprite">
+                <div class="info">
+                  <div class="types-row">
+                    @for (type of p.types; track type) {
+                      <div class="type-icon-wrapper" [style.background-color]="getTypeColor(type)" [title]="type">
+                        <img [src]="getTypeIcon(type)" [alt]="type" class="type-icon">
+                      </div>
+                    }
+                  </div>
+                  <p><strong>Peso:</strong> {{ p.weight / 10 }} kg</p>
+                </div>                <div class="radar-chart">
+                  <canvas baseChart
+                    [data]="getChartData(p)"
+                    [options]="radarChartOptions"
+                    [type]="'radar'">
+                  </canvas>
+                </div>
+                <button class="evo-btn" (click)="viewEvolutionLine(p)">
+                  Ver Línea Evolutiva
+                </button>
+              </div>
+            }
+          </div>
+
+          <button class="mobile-nav-btn next mobile-only" (click)="nextCard()">❯</button>
+        </div>
+
+        <div class="indicators mobile-only">
+          @for (p of team; track $index; let idx = $index) {
+            <span class="dot" [class.active]="idx === currentCardIndex()"></span>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (selectedFamily(); as family) {
+    <div class="detail-overlay family-overlay" (click)="closeFamily()">
+      <div class="family-details" (click)="$event.stopPropagation()">
+        <button class="close-btn" (click)="closeFamily()">×</button>
+        <h2>Línea Evolutiva</h2>
+        <div class="cards-wrapper family-wrapper">
+          <button class="mobile-nav-btn prev mobile-only" (click)="prevFamilyCard()">❮</button>
+          
+          <div class="cards-container family-container" 
+               [style.transform]="'translateX(' + (-currentFamilyIndex() * 100) + '%)'">
+            @for (p of family; track p.id; let idx = $index) {
+              <div class="pokemon-detail-card" [class.active-card]="idx === currentFamilyIndex()">
+                <div class="p-header">
+                  <span class="p-number">#{{ p.id }}</span>
+                  <h3>{{ p.name | uppercase }}</h3>
+                </div>
+                <img [src]="p.image" [alt]="p.name" class="detail-sprite">
+                <div class="info">
+                  <p>Tier {{ p.tier }}</p>
+                  <div class="types-row center">
+                    @for (type of p.types; track type) {
+                      <div class="type-icon-wrapper mini" [style.background-color]="getTypeColor(type)" [title]="type">
+                        <img [src]="getTypeIcon(type)" [alt]="type" class="type-icon">
+                      </div>
+                    }
+                  </div>
+                </div>                <div class="radar-chart">
+                  <canvas baseChart
+                    [data]="getChartData(p)"
+                    [options]="radarChartOptions"
+                    [type]="'radar'">
+                  </canvas>
+                </div>
+              </div>
+            }
+          </div>
+
+          <button class="mobile-nav-btn next mobile-only" (click)="nextFamilyCard()">❯</button>
+        </div>
+
+        <div class="indicators mobile-only">
+          @for (p of family; track $index; let idx = $index) {
+            <span class="dot" [class.active]="idx === currentFamilyIndex()"></span>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (loadingFamily()) {
+    <div class="loading-overlay">
+      <div class="spinner"></div>
+      <p>Cargando evolución...</p>
+    </div>
+  }
+
+  @if (hallOfFame().length === 0) {
+    <div class="empty-msg">
+      <p>Aún no has completado ninguna liga.</p>
+    </div>
+  }
+</div>

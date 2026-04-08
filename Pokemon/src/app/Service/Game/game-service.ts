@@ -110,6 +110,7 @@ export class GameService {
   readonly opponentTeam = signal<(Pokemon | null)[]>([null, null, null]);
   readonly isExchangePhase = signal<boolean>(false);
   readonly showLeagueAnnouncement = signal<boolean>(false);
+  private hasSavedHallOfFame = false;
 
   readonly volume = signal<number>(0.1);
 
@@ -123,7 +124,15 @@ export class GameService {
     this.team().every((p) => p === null || p.isFainted)
   );
 
-  readonly isLeagueVictory = computed(() => this.isLeaguePhase() && this.leagueWins() >= 4);
+  readonly isLeagueVictory = computed(() => {
+    const victory = this.isLeaguePhase() && this.leagueWins() >= 4;
+    if (victory && !this.hasSavedHallOfFame) {
+      this.hasSavedHallOfFame = true;
+      const currentTeam = this.team().filter(p => p !== null) as Pokemon[];
+      this.storageService.saveHallOfFame(currentTeam);
+    }
+    return victory;
+  });
 
   readonly canEvolve = computed(() => this.victories() >= 10 && this.currentTier() < 3);
 
@@ -139,6 +148,7 @@ export class GameService {
     this.opponent.set(null);
     this.defeatedOpponent.set(null);
     this.evolvedTeamPreview.set([]);
+    this.hasSavedHallOfFame = false;
     
     // Reset Boosts
     this.isTierBoostActive.set(false);

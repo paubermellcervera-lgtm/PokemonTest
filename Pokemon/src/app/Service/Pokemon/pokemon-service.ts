@@ -27,6 +27,7 @@ export class PokemonService {
       types: data.types.map((t: any) => t.type.name),
       isFainted: false,
       evolutionChainId: chainId,
+      weight: data.weight,
       stats: data.stats.map((s: any) => ({
         name: s.stat.name,
         value: s.base_stat,
@@ -98,6 +99,37 @@ export class PokemonService {
       console.error('Error en el proceso de evolución:', e);
     }
     return null;
+  }
+
+  async getFamilyByChainId(chainId: number): Promise<Pokemon[]> {
+    try {
+      const chainData: any = await firstValueFrom(
+        this.http.get(`${this.baseUrl}/evolution-chain/${chainId}/`)
+      );
+      
+      const family: Pokemon[] = [];
+      
+      // Stage 1
+      const s1Id = this.extractIdFromUrl(chainData.chain.species.url);
+      family.push(await this.getPokemonById(s1Id, 1));
+      
+      // Stage 2
+      if (chainData.chain.evolves_to.length > 0) {
+        const s2Id = this.extractIdFromUrl(chainData.chain.evolves_to[0].species.url);
+        family.push(await this.getPokemonById(s2Id, 2));
+        
+        // Stage 3
+        if (chainData.chain.evolves_to[0].evolves_to.length > 0) {
+          const s3Id = this.extractIdFromUrl(chainData.chain.evolves_to[0].evolves_to[0].species.url);
+          family.push(await this.getPokemonById(s3Id, 3));
+        }
+      }
+      
+      return family;
+    } catch (e) {
+      console.error('Error fetching family:', e);
+      return [];
+    }
   }
 
   async getRandomItems(count: number): Promise<Item[]> {
