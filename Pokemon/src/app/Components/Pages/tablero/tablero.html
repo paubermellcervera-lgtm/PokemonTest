@@ -57,7 +57,8 @@
         </div>
       } @else {
         @if (pokemonRival || gameService.loadingOpponent()) {
-          <app-carta-pokemon 
+          <app-carta-pokemon
+            class="carta-rival"
             [pokemon]="pokemonRival" 
             [hideStats]="true"
             [isLoading]="gameService.loadingOpponent()"
@@ -194,7 +195,6 @@
                 [isLoading]="gameService.loadingSlots()[slot]"
                 [showOnlyStatId]="esFaseSeleccion ? null : estadisticaSeleccionada"
                 [isInitial]="esFaseSeleccion && rerolls[slot] === 3"
-                [isLeader]="leaderIndex() === slot"
                 [actionText]="getActionText(slot)"
                 [rerollCount]="esFaseSeleccion && rerolls[slot] < 3 ? rerolls[slot] : null"
                 (rerollClick)="reroll(slot)"

@@ -18,6 +18,12 @@
   position: relative;
 }
 
+.carta-rival {
+  width: 100%;
+  max-width: 20rem;
+  height: auto;
+}
+
 .btn-back-corner {
   position: absolute;
   top: 1rem;

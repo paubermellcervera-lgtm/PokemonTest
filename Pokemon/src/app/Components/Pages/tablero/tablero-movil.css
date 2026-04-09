@@ -1,5 +1,53 @@
 /* TABLERO MOVIL - AJUSTES EXCLUSIVOS */
 
+.carta-rival {
+  width: 100% !important;
+  max-width: 90vw !important;
+  height: auto !important;
+}
+
+.carta-rival .container {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 0.8rem !important;
+  padding: 0.6rem !important;
+  min-height: 5rem !important;
+  border-width: 0.15rem !important;
+}
+
+.carta-rival .pokemon-image {
+  display: none !important;
+}
+
+.carta-rival .pokemon-sprite {
+  width: 5.5rem !important;
+  height: 5.5rem !important;
+}
+
+.carta-rival .row-identity {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  width: 6.5rem !important;
+}
+
+.carta-rival .row-health {
+  flex-grow: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.4rem !important;
+}
+
+.carta-rival .row-power {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-end !important;
+  justify-content: center !important;
+  min-width: 5rem !important;
+  gap: 0.3rem !important;
+}
+
 .tablero-container {
   padding: 0.1rem 0.3rem !important;
   gap: 0 !important;
