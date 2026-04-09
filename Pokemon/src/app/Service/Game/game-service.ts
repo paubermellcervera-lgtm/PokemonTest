@@ -305,9 +305,9 @@ export class GameService {
 
   private async getTier3Version(p: Pokemon): Promise<Pokemon> {
     // Buscar la evolución final (Tier 3)
-    let evolved = await this.pokemonService.getNextEvolution(p.evolutionChainId!, p.name, p.tier);
+    let evolved = await this.pokemonService.getNextEvolution(p.evolutionChainId!, p.name, p.tier, p.isShiny);
     if (evolved && evolved.tier < 3) {
-      const finalEvo = await this.pokemonService.getNextEvolution(evolved.evolutionChainId!, evolved.name, evolved.tier);
+      const finalEvo = await this.pokemonService.getNextEvolution(evolved.evolutionChainId!, evolved.name, evolved.tier, p.isShiny);
       if (finalEvo) evolved = finalEvo;
     }
     // Si no hay evolución o ya es Tier 3, se queda igual pero con stats de Tier 3 (simulado)
@@ -629,7 +629,8 @@ export class GameService {
       const evolved = await this.pokemonService.getNextEvolution(
         p.evolutionChainId!,
         p.name,
-        p.tier
+        p.tier,
+        p.isShiny
       );
       
       const finalEvo = (evolved && !usedIds.has(evolved.id)) 

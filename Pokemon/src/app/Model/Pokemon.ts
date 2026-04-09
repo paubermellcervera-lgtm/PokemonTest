@@ -23,4 +23,5 @@ export interface Pokemon {
   weight: number;
   isFainted: boolean;
   evolutionChainId: number;
+  isShiny?: boolean;
 }

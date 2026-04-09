@@ -45,9 +45,15 @@
               <div class="pokemon-detail-card" [class.active-card]="idx === currentCardIndex()">
                 <div class="p-header">
                   <span class="p-number">#{{ p.id }}</span>
-                  <h3>{{ p.name | uppercase }}</h3>
+                   
+                  <div class="title-row">
+                    <h3>{{ p.name | uppercase }}</h3>
+                    @if (p.isShiny) {
+                      <span class="shiny-badge">✨</span>
+                    }
+                  </div>
                 </div>
-                <img [src]="p.image" [alt]="p.name" class="detail-sprite">
+                <img [src]="getHiResImg(p.id, p.isShiny)" [alt]="p.name" class="detail-sprite">
                 <div class="info">
                   <div class="types-row">
                     @for (type of p.types; track type) {
@@ -97,9 +103,14 @@
               <div class="pokemon-detail-card" [class.active-card]="idx === currentFamilyIndex()">
                 <div class="p-header">
                   <span class="p-number">#{{ p.id }}</span>
-                  <h3>{{ p.name | uppercase }}</h3>
+                  <div class="title-row">
+                    <h3>{{ p.name | uppercase }}</h3>
+                    @if (p.isShiny) {
+                      <span class="shiny-badge">✨</span>
+                    }
+                  </div>
                 </div>
-                <img [src]="p.image" [alt]="p.name" class="detail-sprite">
+                <img [src]="getHiResImg(p.id, p.isShiny)" [alt]="p.name" class="detail-sprite">
                 <div class="info">
                   <p>Tier {{ p.tier }}</p>
                   <div class="types-row center">

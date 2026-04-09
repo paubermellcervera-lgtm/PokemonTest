@@ -211,24 +211,51 @@
 .p-header {
   width: 100%;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  margin-bottom: 10px;
+  gap: 5px;
+  margin-bottom: 15px;
 }
 
-.p-number { color: #aaa; font-size: 0.9rem; }
-.p-header h3 { margin: 0; color: #ffcb05; font-size: 1.2rem; }
-.detail-sprite { height: 120px; margin-bottom: 10px; }
+.title-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.p-number { 
+  color: #aaa; 
+  font-size: 0.9rem;
+  order: -1;
+}
+
+.p-header h3 { 
+  margin: 0; 
+  color: #ffcb05; 
+  font-size: 1.2rem; 
+  text-align: center;
+}
+
+.detail-sprite { 
+  height: 140px; 
+  margin-bottom: 15px; 
+  filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));
+}
+
 .info {
   width: 100%;
   font-size: 0.9rem;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
+  text-align: center;
 }
 
 .types-row {
   display: flex;
   gap: 8px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+  justify-content: center;
 }
 
 .types-row.center {
@@ -258,7 +285,20 @@
   object-fit: contain;
 }
 
-.radar-chart { width: 100%; height: 200px; }
+.radar-chart { 
+  width: 100%; 
+  max-width: 250px;
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+}
+
+.radar-chart canvas {
+  max-width: 100% !important;
+  max-height: 100% !important;
+}
 
 .evo-btn {
   margin-top: 15px;
@@ -303,6 +343,7 @@
 
 .pokemon-detail-card.mini {
   max-width: 350px;
+  justify-content: center;
 }
 
 .loading-overlay {
@@ -408,4 +449,21 @@
   }
 
   .family-details { padding: 20px; }
+}
+
+.title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.shiny-badge {
+  font-size: 1.2rem;
+  filter: drop-shadow(0 0 2px #ffcb05);
+  animation: shine 1.5s infinite alternate;
+}
+
+@keyframes shine {
+  from { opacity: 0.5; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1.1); }
 }

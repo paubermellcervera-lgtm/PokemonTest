@@ -10,24 +10,26 @@ import { Item, ITEM_EFFECTS, ItemEffect } from '../../Model/Item';
 export class PokemonService {
   private http = inject(HttpClient);
   private baseUrl = 'https://pokeapi.co/api/v2';
-
-  
-  async getPokemonById(id: number | string, tier: 1 | 2 | 3): Promise<Pokemon> {
+  private HiResImg = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/';
+  async getPokemonById(id: number | string, tier: 1 | 2 | 3, forcedShiny?: boolean): Promise<Pokemon> {
     const data: any = await firstValueFrom(this.http.get(`${this.baseUrl}/pokemon/${id}`));
     const speciesData: any = await firstValueFrom(this.http.get(data.species.url));
-    
+    const ShinyChance = 0.10; // 10% de probabilidad de ser shiny
+    const isShiny = forcedShiny !== undefined ? forcedShiny : Math.random() < ShinyChance;
+    const imageUrl = isShiny ? data.sprites.front_shiny : data.sprites.front_default;
     const chainId = this.extractIdFromUrl(speciesData.evolution_chain.url);
 
     return {
       id: data.id,
       name: data.name,
-      image: data.sprites.front_default, // Sprite clásico
+      image: imageUrl, // Sprite shiny o clásico
       cry: data.cries?.latest, // Grito del pokemon
       tier: tier,
       types: data.types.map((t: any) => t.type.name),
       isFainted: false,
       evolutionChainId: chainId,
       weight: data.weight,
+      isShiny: isShiny,
       stats: data.stats.map((s: any) => ({
         name: s.stat.name,
         value: s.base_stat,
@@ -35,7 +37,16 @@ export class PokemonService {
     };
   }
 
-  
+  getHiResImg(id: number, isShiny?: boolean): string {
+    return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${isShiny ? 'shiny/' : ''}${id}.png`;
+  }
+
+  async getHiResImageUrl(id: number, isShiny: boolean): Promise<string> {
+    if (isShiny) {
+      return `${this.HiResImg}shiny/${id}-shiny.png`;
+    }
+    return `${this.HiResImg}${id}.png`;
+  }
   async getRandom3StageFamily(): Promise<{ t1: number; t2: number; t3: number }> {
     let found = false;
     let family = { t1: 0, t2: 0, t3: 0 };
@@ -52,7 +63,6 @@ export class PokemonService {
         if (stage1 && stage1.evolves_to.length > 0) {
           const stage2 = stage1.evolves_to[0];
           
-         
           if (stage2.evolves_to.length > 0) {
             const stage3 = stage2.evolves_to[0];
             
@@ -65,21 +75,19 @@ export class PokemonService {
           }
         }
       } catch (e) {
-        
+        // Silently catch errors from invalid chain IDs
       }
     }
     return family;
   }
 
-  
   async getRandomPokemonByTier(tier: 1 | 2 | 3): Promise<Pokemon> {
     const family = await this.getRandom3StageFamily();
     const id = tier === 1 ? family.t1 : tier === 2 ? family.t2 : family.t3;
     return this.getPokemonById(id, tier);
   }
 
-  
-  async getNextEvolution(chainId: number, currentName: string, currentTier: number): Promise<Pokemon | null> {
+  async getNextEvolution(chainId: number, currentName: string, currentTier: number, forcedShiny?: boolean): Promise<Pokemon | null> {
     try {
       const chainData: any = await firstValueFrom(
         this.http.get(`${this.baseUrl}/evolution-chain/${chainId}/`)
@@ -93,7 +101,7 @@ export class PokemonService {
 
       if (current && current.species.name === currentName && current.evolves_to.length > 0) {
         const nextId = this.extractIdFromUrl(current.evolves_to[0].species.url);
-        return this.getPokemonById(nextId, (currentTier + 1) as 1 | 2 | 3);
+        return this.getPokemonById(nextId, (currentTier + 1) as 1 | 2 | 3, forcedShiny);
       }
     } catch (e) {
       console.error('Error en el proceso de evolución:', e);
@@ -101,7 +109,7 @@ export class PokemonService {
     return null;
   }
 
-  async getFamilyByChainId(chainId: number): Promise<Pokemon[]> {
+  async getFamilyByChainId(chainId: number, forcedShiny?: boolean): Promise<Pokemon[]> {
     try {
       const chainData: any = await firstValueFrom(
         this.http.get(`${this.baseUrl}/evolution-chain/${chainId}/`)
@@ -111,17 +119,17 @@ export class PokemonService {
       
       // Stage 1
       const s1Id = this.extractIdFromUrl(chainData.chain.species.url);
-      family.push(await this.getPokemonById(s1Id, 1));
+      family.push(await this.getPokemonById(s1Id, 1, forcedShiny));
       
       // Stage 2
       if (chainData.chain.evolves_to.length > 0) {
         const s2Id = this.extractIdFromUrl(chainData.chain.evolves_to[0].species.url);
-        family.push(await this.getPokemonById(s2Id, 2));
+        family.push(await this.getPokemonById(s2Id, 2, forcedShiny));
         
         // Stage 3
         if (chainData.chain.evolves_to[0].evolves_to.length > 0) {
           const s3Id = this.extractIdFromUrl(chainData.chain.evolves_to[0].evolves_to[0].species.url);
-          family.push(await this.getPokemonById(s3Id, 3));
+          family.push(await this.getPokemonById(s3Id, 3, forcedShiny));
         }
       }
       

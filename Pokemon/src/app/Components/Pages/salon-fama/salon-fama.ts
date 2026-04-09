@@ -133,13 +133,17 @@ export class SalonFama implements AfterViewInit {
     if (!p.evolutionChainId) return;
     this.loadingFamily.set(true);
     try {
-      const family = await this.pokemonService.getFamilyByChainId(p.evolutionChainId);
+      const forcedShiny = p.isShiny;
+      const family = await this.pokemonService.getFamilyByChainId(p.evolutionChainId, forcedShiny);
       this.selectedFamily.set(family);
       this.currentFamilyIndex.set(0);
+    } catch (error) {
+      console.error('Error fetching evolution line:', error);
     } finally {
       this.loadingFamily.set(false);
     }
   }
+
 
   nextFamilyCard() {
     const family = this.selectedFamily();
@@ -155,6 +159,10 @@ export class SalonFama implements AfterViewInit {
 
   closeFamily() {
     this.selectedFamily.set(null);
+  }
+
+  getHiResImg(id: number, isShiny?: boolean) {
+    return this.pokemonService.getHiResImg(id, isShiny);
   }
 
   getTypeIcon(type: string) {
@@ -184,3 +192,4 @@ export class SalonFama implements AfterViewInit {
     };
   }
 }
+

@@ -19,7 +19,12 @@
       </div>
       
       <div class="pokemon-info">
-        <h3>{{ p.name | titlecase }}</h3>
+        <div class="name-row">
+          <h3>{{ p.name | titlecase }}</h3>
+          @if (p.isShiny) {
+            <span class="shiny-badge">✨</span>
+          }
+        </div>
         
         <div class="types-container">
           @for (type of p.types; track type) {
@@ -69,6 +74,9 @@
       <div class="row-health">
         <div class="name-line">
           <span class="p-name">{{ p.name | titlecase }}</span>
+          @if (p.isShiny) {
+            <span class="shiny-badge mini">✨</span>
+          }
         </div>
         
         @if (!hideStats()) {
