@@ -829,7 +829,7 @@
   }
 
   100% {
-    transform: translateY(-3vh) scale(1.08);
+    transform: translateY(-3.2vh) scale(1.08);
   }
 
   /* Subtle scaling and lunge */
