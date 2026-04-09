@@ -96,7 +96,9 @@
 .side-info.right {
   right: 1rem;
 }
-
+.esp{
+  font-size: 0.1rem;
+}
 .side-badge {
   display: flex;
   flex-direction: column;
@@ -827,7 +829,7 @@
   }
 
   100% {
-    transform: translateY(-2vh) scale(1.08);
+    transform: translateY(-3vh) scale(1.08);
   }
 
   /* Subtle scaling and lunge */

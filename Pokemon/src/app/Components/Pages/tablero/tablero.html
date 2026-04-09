@@ -75,11 +75,13 @@
         @if (!esLiga) {
           <div class="side-badge tier-badge">
             <span class="label">TIER</span>
+            <br>
             <span class="value">{{ gameService.currentTier() }}</span>
           </div>
         } @else {
           <div class="side-badge league-badge">
             <span class="label">LIGA</span>
+            <br>
             <span class="value">{{ gameService.leagueWins() + 1 }}/4</span>
           </div>
         }
@@ -133,6 +135,7 @@
           } @else {
             <span class="label">VICTORIAS</span>
           }
+          <br class="esp">
           <span class="value">{{ gameService.totalVictories() }}</span>
         </div>
       </div>
