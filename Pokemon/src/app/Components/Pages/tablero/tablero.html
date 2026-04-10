@@ -2,7 +2,7 @@
 <div class="tablero-container">
   
   <!-- BOTÓN VOLVER (SOLO EL BOTÓN A LA IZQUIERDA) -->
-  <button routerLink="/menu" class="btn-back-corner">
+  <button (click)="volverAlMenu()" class="btn-back-corner">
     <img src="/img/Flecha atrás.png" alt="Menú" class="back-icon">
   </button>
 
@@ -226,7 +226,7 @@
     <div class="game-over-modal">
       <h2>¡DERROTA!</h2>
       <p>Has conseguido {{ gameService.totalVictories() }} victorias.</p>
-      <button routerLink="/menu" class="btn-danger">Volver al Inicio</button>
+      <button (click)="volverAlMenu()" class="btn-danger">Volver al Inicio</button>
     </div>
   }
 @if (gameService.isLeagueVictory()) {

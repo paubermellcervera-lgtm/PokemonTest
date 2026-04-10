@@ -184,6 +184,26 @@ export class PokemonService {
     return items;
   }
 
+  async getMegaEvolutions(pokemonName: string, tier: 1 | 2 | 3, forcedShiny?: boolean): Promise<Pokemon[]> {
+    try {
+      const response: any = await firstValueFrom(this.http.get(`${this.baseUrl}/pokemon/${pokemonName}`));
+      const speciesResponse: any = await firstValueFrom(this.http.get(response.species.url));
+      
+      const megaVarieties = speciesResponse.varieties.filter((v: any) => v.pokemon.name.includes('-mega'));
+      const megas: Pokemon[] = [];
+
+      for (const variety of megaVarieties) {
+        const megaData = await this.getPokemonById(variety.pokemon.name, tier, forcedShiny);
+        megas.push(megaData);
+      }
+
+      return megas;
+    } catch (e) {
+      console.error(`Error fetching megas for ${pokemonName}:`, e);
+      return [];
+    }
+  }
+
   private extractIdFromUrl(url: string): number {
     const parts = url.split('/').filter(Boolean);
     return parseInt(parts[parts.length - 1], 10);

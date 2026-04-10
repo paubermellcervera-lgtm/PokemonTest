@@ -173,7 +173,17 @@ export class Tablero {
 
   async volverAlMenu() {
     await this.gameService.initGame();
+    await this.preloadImage('/img/Paisaje pokemon.webp');
     this.router.navigate(['/menu']);
+  }
+
+  private preloadImage(url: string): Promise<void> {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.src = url;
+      img.onload = () => resolve();
+      img.onerror = () => resolve(); // Continuar aunque falle la carga
+    });
   }
 
   closeLeagueAnnouncement() {

@@ -1,6 +1,6 @@
 import { Component, inject, signal, HostListener, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { StorageService } from '../../../Service/storage-service';
 import { Pokemon, ALL_STATS } from '../../../Model/Pokemon';
 import { PokemonService } from '../../../Service/Pokemon/pokemon-service';
@@ -18,6 +18,7 @@ import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
 export class SalonFama implements AfterViewInit {
   private storageService = inject(StorageService);
   private pokemonService = inject(PokemonService);
+  private router = inject(Router);
   hallOfFame = signal<Pokemon[][]>(this.storageService.getHallOfFame());
   
   currentIndex = signal(0);
@@ -142,6 +143,22 @@ export class SalonFama implements AfterViewInit {
         family.push(swordForm);
       }
 
+      // Buscar Megaevoluciones para cada miembro de la familia
+      const megas: Pokemon[] = [];
+      for (const member of family) {
+        // Solo buscamos megas para el nombre base (sin sufijos como -sword o -shield)
+        const baseName = member.name.split('-')[0];
+        const memberMegas = await this.pokemonService.getMegaEvolutions(baseName, member.tier, forcedShiny);
+        megas.push(...memberMegas);
+      }
+      
+      // Añadir megas encontradas a la familia, evitando duplicados por ID
+      for (const mega of megas) {
+        if (!family.find(f => f.id === mega.id)) {
+          family.push(mega);
+        }
+      }
+
       this.selectedFamily.set(family);
       this.currentFamilyIndex.set(0);
     } catch (error) {
@@ -176,6 +193,20 @@ export class SalonFama implements AfterViewInit {
     return getTypeIconUrl(type);
   }
 
+  private preloadImage(url: string): Promise<void> {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.src = url;
+      img.onload = () => resolve();
+      img.onerror = () => resolve(); // Continuar aunque falle la carga
+    });
+  }
+
+  async volverAlMenu() {
+    await this.preloadImage('/img/Paisaje pokemon.webp');
+    this.router.navigate(['/menu']);
+  }
+
   getTypeColor(type: string) {
     return TYPE_COLORS[type] || '#777';
   }
@@ -199,4 +230,3 @@ export class SalonFama implements AfterViewInit {
     };
   }
 }
-

@@ -51,14 +51,31 @@ export class Menu {
     }
   ];
   Tutorial = false;
+
+  private preloadImage(url: string): Promise<void> {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.src = url;
+      img.onload = () => resolve();
+      img.onerror = () => resolve(); // Continuar aunque falle la carga
+    });
+  }
+
   async iniciarJuego() {
     this.storageService.clearGameState();
     await this.gameService.initGame();
+    await this.preloadImage('/img/Fondo Combate.webp');
     this.router.navigate(['/tablero']);
   }
 
-  continuarJuego() {
+  async continuarJuego() {
+    await this.preloadImage('/img/Fondo Combate.webp');
     this.router.navigate(['/tablero']);
+  }
+
+  async irAlSalonFama() {
+    await this.preloadImage('/img/Paisaje pokemon.webp');
+    this.router.navigate(['/salon-fama']);
   }
 
   toggleHowToPlay() {

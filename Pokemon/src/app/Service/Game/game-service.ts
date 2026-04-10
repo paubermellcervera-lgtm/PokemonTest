@@ -340,6 +340,7 @@ export class GameService {
       this.isForcedCapture.set(true);
       this.defeatedOpponent.set(this.opponent());
       this.consumeItem(item.id);
+      await this.preloadImage('/img/Fondo Combate.webp');
       this.router.navigate(['/cambio']);
     }
   }
@@ -480,8 +481,18 @@ export class GameService {
       await this.startLeague();
     } else {
       this.defeatedOpponent.set(this.opponent());
+      await this.preloadImage('/img/Fondo Combate.webp');
       this.router.navigate(['/cambio']);
     }
+  }
+
+  private preloadImage(url: string): Promise<void> {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.src = url;
+      img.onload = () => resolve();
+      img.onerror = () => resolve(); // Continuar aunque falle la carga
+    });
   }
 
   async startLeague() {
@@ -657,8 +668,11 @@ export class GameService {
     this.isExchangePhase.set(false);
     if (this.canEvolve()) {
       await this.prepareEvolution();
+      await this.preloadImage('/img/Fondo Combate.webp');
+      this.router.navigate(['/tablero']);
     } else {
       await this.spawnOpponent();
+      await this.preloadImage('/img/Fondo Combate.webp');
       this.router.navigate(['/tablero']);
     }
   }
