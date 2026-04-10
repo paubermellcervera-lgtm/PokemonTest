@@ -393,5 +393,11 @@ export class Tablero {
   Chetos2() {
     this.gameService.leagueWins.set(4);
   }
-
+  Aegislash() {
+    this.gameService.team.set([
+      { id: 681, name: 'Aegislash', image: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/681.png', tier: 3, types: ['steel', 'ghost'], stats: [], weight: 53, isFainted: false, evolutionChainId: 0 },
+      null,
+      null
+    ]);
+}
 }

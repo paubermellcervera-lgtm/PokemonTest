@@ -135,6 +135,13 @@ export class SalonFama implements AfterViewInit {
     try {
       const forcedShiny = p.isShiny;
       const family = await this.pokemonService.getFamilyByChainId(p.evolutionChainId, forcedShiny);
+      
+      // Si es la línea de Aegislash (evolutionChainId 349), añadimos su forma espada
+      if (p.evolutionChainId === 349) {
+        const swordForm = await this.pokemonService.getPokemonById(10026, 3, forcedShiny);
+        family.push(swordForm);
+      }
+
       this.selectedFamily.set(family);
       this.currentFamilyIndex.set(0);
     } catch (error) {

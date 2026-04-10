@@ -319,6 +319,8 @@ export class GameService {
     if (item?.effect === 'instant-win') {
       this.consumeItem(item.id);
       
+      await this.checkAegislashForms();
+
       if (this.isLeaguePhase()) {
         const opponentIndex = this.opponentTeam().findIndex(p => p && !p.isFainted);
         if (opponentIndex !== -1) {
@@ -334,6 +336,7 @@ export class GameService {
   async applyForceCapture() {
     const item = this.selectedItemForBattle();
     if (item?.effect === 'capture' && !this.isLeaguePhase()) {
+      await this.checkAegislashForms();
       this.isForcedCapture.set(true);
       this.defeatedOpponent.set(this.opponent());
       this.consumeItem(item.id);
@@ -392,6 +395,8 @@ export class GameService {
     const effectivePlayerStat = playerStatValue * bonus * itemMultiplier;
     const winsMatch = effectivePlayerStat >= effectiveRivalStat;
 
+    await this.checkAegislashForms();
+
     if (winsMatch) {
       if (isCombatItem && item.effect === 'capture') {
         this.captureOpponent(playerIndex);
@@ -423,6 +428,44 @@ export class GameService {
       }
       return false;
     }
+  }
+
+  private async checkAegislashForms() {
+    // Para el equipo del jugador
+    const currentTeam = [...this.team()];
+    let teamChanged = false;
+    for (let i = 0; i < currentTeam.length; i++) {
+      const p = currentTeam[i];
+      if (p && (p.id === 681 || p.id === 10026)) {
+        const nextId = p.id === 681 ? 10026 : 681;
+        const newForm = await this.pokemonService.getPokemonById(nextId, p.tier, p.isShiny);
+        currentTeam[i] = { ...newForm, isFainted: p.isFainted };
+        teamChanged = true;
+      }
+    }
+    if (teamChanged) this.team.set(currentTeam);
+
+    // Para el oponente actual (fuera de la liga)
+    const currentOpponent = this.opponent();
+    if (currentOpponent && (currentOpponent.id === 681 || currentOpponent.id === 10026)) {
+      const nextId = currentOpponent.id === 681 ? 10026 : 681;
+      const newForm = await this.pokemonService.getPokemonById(nextId, currentOpponent.tier, currentOpponent.isShiny);
+      this.opponent.set({ ...newForm, isFainted: currentOpponent.isFainted });
+    }
+
+    // Para el equipo oponente (en la liga)
+    const currentOpponentTeam = [...this.opponentTeam()];
+    let opponentTeamChanged = false;
+    for (let i = 0; i < currentOpponentTeam.length; i++) {
+      const p = currentOpponentTeam[i];
+      if (p && (p.id === 681 || p.id === 10026)) {
+        const nextId = p.id === 681 ? 10026 : 681;
+        const newForm = await this.pokemonService.getPokemonById(nextId, p.tier, p.isShiny);
+        currentOpponentTeam[i] = { ...newForm, isFainted: p.isFainted };
+        opponentTeamChanged = true;
+      }
+    }
+    if (opponentTeamChanged) this.opponentTeam.set(currentOpponentTeam);
   }
 
   async winBattle() {
@@ -544,6 +587,7 @@ export class GameService {
       });
     }
 
+    await this.checkAegislashForms();
     this.checkLeagueRoundEnd();
   }
 
