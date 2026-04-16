@@ -1,0 +1,76 @@
+{
+  "MENU": {
+    "HIGH_SCORE": "Puntuación Máxima",
+    "TITLE": "Juego Pokémon",
+    "CONTINUE": "Continuar",
+    "NEW_GAME": "Nueva Partida",
+    "START_GAME": "Iniciar Juego",
+    "HOW_TO_PLAY": "¿Cómo jugar?",
+    "HALL_OF_FAME": "Salón de la Fama",
+    "CLOSE": "Cerrar"
+  },
+  "TUTORIAL": {
+    "SLIDE_1": "Elige tu equipo inicial de 3 Pokémon.",
+    "SLIDE_2": "Usa rerolls para cambiar y mejorar tus opciones.",
+    "SLIDE_3": "Las batallas dependen de stats y tipos.",
+    "SLIDE_4": "Usa objetos para curar, revivir o potenciar.",
+    "SLIDE_5": "Activa objetos en el momento clave.",
+    "SLIDE_6": "Gana combates para avanzar.",
+    "SLIDE_7": "La dificultad aumenta con el tier."
+  },
+  "TABLERO": {
+    "TITLE": "Combate Pokémon",
+    "ACTION": "Realizar acción",
+    "VICTORY": "¡Victoria!",
+    "DEFEAT": "¡Derrota!",
+    "EVOLUTION": "¡EVOLUCIÓN!",
+    "EVOLUTION_PROGRESS": "Evolución",
+    "SELECT_RIVAL": "Selecciona un rival",
+    "CHOOSE_POKEMON": "¡Elige a tu Pokémon!",
+    "REVIVE_PROMPT": "Selecciona un Pokémon debilitado para reanimarlo",
+    "WINS_SHORT": "VIC",
+    "WINS_LONG": "VICTORIAS",
+    "PREPARE_TEAM": "PREPARA TU EQUIPO",
+    "YOUR_TEAM": "Tu Equipo",
+    "CONFIRM_TEAM": "¡CONFIRMAR EQUIPO!",
+    "DEFEAT_MODAL": "¡DERROTA!",
+    "VICTORIES_ACHIEVED": "Has conseguido",
+    "VICTORIES_COUNT": "victorias.",
+    "BACK_TO_START": "Volver al Inicio",
+    "CHAMPION": "🎉 ¡NUEVO CAMPEÓN! 🎉",
+    "LEAGUE_VICTORY": "Has superado la Liga Pokémon con honor.",
+    "BACK_TO_MENU": "Volver al Menú Principal",
+    "LEAGUE_ARRIVAL": "¡HAS LLEGADO A LA LIGA POKÉMON!",
+    "TEAM_HEALED": "Tu equipo ha sido curado por completo.",
+    "FINAL_CHALLENGE": "Prepárate para el desafío final.",
+    "START_LEAGUE": "¡EMPEZAR!"
+  },
+  "LIGA_POKEMON": {
+    "OPPONENT_LEAGUE": "Alto Mando",
+    "OPPONENT_NORMAL": "Oponente"
+  },
+  "ITEMS": {
+    "Master Ball": "Master Ball",
+    "Ultra Ball": "Ultra Ball",
+    "X-Attack": "X-Ataque",
+    "Choice Band": "Cinta Especial",
+    "Focus Band": "Cinta Focal",
+    "Max Revive": "Max Poción",
+    "Rare Candy": "Caramelo Raro",
+    "Escape Rope": "Cuerda de Escape",
+    "Revive": "Revivir"
+  },
+  "ITEM_DESCRIPTIONS": {
+    "instant-win": "Gana el combate automáticamente (Efecto Master Ball).",
+    "capture": "Captura al oponente actual inmediatamente y te obliga a cambiarlo por uno de tu equipo.",
+    "stat-boost-50": "+50% a la estadística de combate actual.",
+    "stat-boost-100": "+100% a la estadística de combate actual.",
+    "shield": "Protege de la derrota: Si pierdes, el Pokémon no se debilita.",
+    "reroll-stat": "Rerollea la estadística seleccionada para el combate.",
+    "revive-all": "Revive a TODOS los Pokémon debilitados del equipo.",
+    "tier-boost": "Tu equipo evoluciona al Tier 3 temporalmente para este combate.",
+    "opponent-reroll": "Cambia al oponente actual por otro aleatorio (No funciona en la Liga).",
+    "opponent-nerf": "Reduce la estadística del rival en un 30%.",
+    "revive-one": "Revive a un Pokémon seleccionado del equipo."
+  }
+}

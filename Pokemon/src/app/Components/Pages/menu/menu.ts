@@ -2,10 +2,12 @@ import { Component, inject, signal, computed } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { GameService } from '../../../Service/Game/game-service';
 import { StorageService } from '../../../Service/storage-service';
+import { TranslatePipe } from '../../../Utils/translate-pipe';
+import { TranslationService } from '../../../Service/Translation/translation-service';
 
 @Component({
   selector: 'app-menu',
-  imports: [RouterLink],
+  imports: [TranslatePipe],
   templateUrl: './menu.html',
   styleUrl: './menu.css',
 })
@@ -13,7 +15,9 @@ export class Menu {
   private router = inject(Router);
   private gameService = inject(GameService);
   private storageService = inject(StorageService);
+  private translationService = inject(TranslationService);
 
+  readonly currentLang = this.translationService.lang;
   readonly highScore = this.storageService.highScore;
   readonly hasSavedGame = computed(() => !!this.storageService.getGameState());
   readonly hasHallOfFame = computed(() => this.storageService.getHallOfFame().length > 0);
@@ -81,6 +85,12 @@ export class Menu {
   toggleHowToPlay() {
     this.showHowToPlay.update(v => !v);
     this.currentSlide.set(0);
+  }
+
+  toggleLang() {
+    console.log('Botón de idioma pulsado');
+    const newLang = this.currentLang() === 'es' ? 'en' : 'es';
+    this.translationService.setLang(newLang);
   }
 
   nextSlide() {

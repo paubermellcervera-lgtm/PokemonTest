@@ -3,53 +3,24 @@
     High Score: {{ highScore() }}
   </div>
 
-  <h1 class="menu-title">Juego Pokémon</h1>
+  <h1 class="menu-title">{{ 'MENU.TITLE' | translate }}</h1>
+
+  <div style="position: relative; z-index: 100;">
+    <button class="btn-lang" (click)="toggleLang()">
+      {{ currentLang() === 'es' ? 'EN' : 'ES' }}
+    </button>
+  </div>
 
   <div class="options">
     @if (hasSavedGame()) {
-      <button class="btn-success" (click)="continuarJuego()">Continuar</button>
-      <button class="btn-primary" (click)="iniciarJuego()">Nueva Partida</button>
+      <button class="btn-success" (click)="continuarJuego()">{{ 'MENU.CONTINUE' | translate }}</button>
+      <button class="btn-primary" (click)="iniciarJuego()">{{ 'MENU.NEW_GAME' | translate }}</button>
     } @else {
-      <button class="btn-primary" (click)="iniciarJuego()">Iniciar Juego</button>
+      <button class="btn-primary" (click)="iniciarJuego()">{{ 'MENU.START' | translate }}</button>
     }
-    @if (Tutorial === false) {
-      <button class="btn-danger-anim" (click)="toggleHowToPlay()" (click)="this.Tutorial = true">¿Cómo jugar?</button>
-    } @else {
-      <button class="btn-neutral" (click)="toggleHowToPlay()">¿Cómo jugar?</button>
-    }
+    <button class="btn-neutral" (click)="toggleHowToPlay()">{{ 'MENU.HOW_TO_PLAY' | translate }}</button>
     @if (hasHallOfFame()) {
-      <button class="btn-Salon_Fama" (click)="irAlSalonFama()">Salón de la Fama</button>
+      <button class="btn-Salon_Fama" (click)="irAlSalonFama()">{{ 'MENU.HALL_OF_FAME' | translate }}</button>
     }
-
-
   </div>
-
-  @if (showHowToPlay()) {
-    <div class="modal">
-      <div class="modal-content">
-        <h2>¿Cómo jugar?</h2>
-        
-        <div class="carousel-container">
-          <div class="carousel-slide">
-            <div class="image-wrapper">
-              <img [src]="slides[currentSlide()].image" alt="Cómo jugar" class="carousel-img">
-            </div>
-            <p class="carousel-text">{{ slides[currentSlide()].text }}</p>
-          </div>
-
-          <div class="carousel-controls">
-            <button class="nav-btn" (click)="prevSlide()">❮</button>
-            <div class="indicators">
-              @for (slide of slides; track $index) {
-                <span class="dot" [class.active]="$index === currentSlide()" (click)="currentSlide.set($index)"></span>
-              }
-            </div>
-            <button class="nav-btn" (click)="nextSlide()">❯</button>
-          </div>
-        </div>
-
-        <button class="btn-danger close-btn" (click)="toggleHowToPlay()">Cerrar</button>
-      </div>
-    </div>
-  }
 </div>

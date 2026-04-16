@@ -1,19 +1,22 @@
 import { Component, inject, signal, effect, computed } from '@angular/core';
-import { RouterLink, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { GameService } from '../../../Service/Game/game-service';
 import { CartaPokemon } from '../../UI/carta-pokemon/carta-pokemon';
 import { getMaxTypeEffectiveness } from '../../../Utils/type-effectiveness';
 import { Item } from '../../../Model/Item';
+import { TranslatePipe } from '../../../Utils/translate-pipe';
+import { TranslationService } from '../../../Service/Translation/translation-service';
 
 @Component({
   selector: 'app-tablero',
-  imports: [CartaPokemon, RouterLink,],
+  imports: [CartaPokemon, TranslatePipe],
   templateUrl: './tablero.html',
   styleUrl: './tablero.css',
 })
 export class Tablero {
   readonly gameService = inject(GameService);
   private router = inject(Router);
+  private translationService = inject(TranslationService);
 
   // Estados de animación de batalla
   animatingIndex = signal<number | null>(null);
@@ -358,20 +361,20 @@ export class Tablero {
   getBoostText(item: Item | null): string {
     if (!item) return '';
     const effect = item.effect;
-    switch (effect) {
-      case 'instant-win': return 'VICTORIA';
-      case 'capture': return 'CAPTURAR';
-      case 'stat-boost-50': return '+50% EST.';
-      case 'stat-boost-100': return '+100% EST.';
-      case 'shield': return 'ESCUDO';
-      case 'revive-all': return 'EQUIPO';
-      case 'tier-boost': return 'TIER MAX';
-      case 'opponent-reroll': return 'REROLL';
-      case 'reroll-stat': return 'REROLL STAT';
-      case 'revive-one': return 'REVIVIR';
-      case 'opponent-nerf': return '-30% RIVAL';
-      default: return '';
-    }
+    const boostMap: Record<string, string> = {
+      'instant-win': 'TABLERO.BOOSTS.VICTORY',
+      'capture': 'TABLERO.BOOSTS.CAPTURE',
+      'shield': 'TABLERO.BOOSTS.SHIELD',
+      'revive-all': 'TABLERO.BOOSTS.TEAM',
+      'tier-boost': 'TABLERO.BOOSTS.TIER_MAX',
+      'opponent-reroll': 'TABLERO.BOOSTS.REROLL',
+      'reroll-stat': 'TABLERO.BOOSTS.REROLL_STAT',
+      'revive-one': 'TABLERO.BOOSTS.REVIVE',
+      'opponent-nerf': 'TABLERO.BOOSTS.NERF'
+    };
+    
+    const translationKey = boostMap[effect] || '';
+    return translationKey ? this.translationService.translate(translationKey) : '';
   }
 
 

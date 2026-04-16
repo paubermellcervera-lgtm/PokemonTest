@@ -11,7 +11,7 @@ import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
 @Component({
   selector: 'app-salon-fama',
   standalone: true,
-  imports: [CommonModule, RouterLink, BaseChartDirective],
+  imports: [CommonModule, BaseChartDirective],
   templateUrl: './salon-fama.html',
   styleUrl: './salon-fama.css'
 })

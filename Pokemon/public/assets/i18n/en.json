@@ -1,0 +1,76 @@
+{
+  "MENU": {
+    "HIGH_SCORE": "High Score",
+    "TITLE": "Pokémon Game",
+    "CONTINUE": "Continue",
+    "NEW_GAME": "New Game",
+    "START_GAME": "Start Game",
+    "HOW_TO_PLAY": "How to play?",
+    "HALL_OF_FAME": "Hall of Fame",
+    "CLOSE": "Close"
+  },
+  "TUTORIAL": {
+    "SLIDE_1": "Choose your initial team of 3 Pokémon.",
+    "SLIDE_2": "Use rerolls to change and improve your options.",
+    "SLIDE_3": "Battles depend on stats and types.",
+    "SLIDE_4": "Use items to heal, revive, or boost.",
+    "SLIDE_5": "Activate items at the key moment.",
+    "SLIDE_6": "Win battles to advance.",
+    "SLIDE_7": "Difficulty increases with the tier."
+  },
+  "TABLERO": {
+    "TITLE": "Pokémon Battle",
+    "ACTION": "Perform action",
+    "VICTORY": "Victory!",
+    "DEFEAT": "Defeat!",
+    "EVOLUTION": "EVOLUTION!",
+    "EVOLUTION_PROGRESS": "Evolution",
+    "SELECT_RIVAL": "Select a rival",
+    "CHOOSE_POKEMON": "Choose your Pokémon!",
+    "REVIVE_PROMPT": "Select a fainted Pokémon to revive",
+    "WINS_SHORT": "WINS",
+    "WINS_LONG": "WINS",
+    "PREPARE_TEAM": "PREPARE YOUR TEAM",
+    "YOUR_TEAM": "Your Team",
+    "CONFIRM_TEAM": "CONFIRM TEAM!",
+    "DEFEAT_MODAL": "DEFEAT!",
+    "VICTORIES_ACHIEVED": "You achieved",
+    "VICTORIES_COUNT": "victories.",
+    "BACK_TO_START": "Back to Start",
+    "CHAMPION": "🎉 NEW CHAMPION! 🎉",
+    "LEAGUE_VICTORY": "You have overcome the Pokémon League with honor.",
+    "BACK_TO_MENU": "Back to Main Menu",
+    "LEAGUE_ARRIVAL": "YOU HAVE REACHED THE POKÉMON LEAGUE!",
+    "TEAM_HEALED": "Your team has been fully healed.",
+    "FINAL_CHALLENGE": "Prepare yourself for the final challenge.",
+    "START_LEAGUE": "LET'S START!"
+  },
+  "LIGA_POKEMON": {
+    "OPPONENT_LEAGUE": "Elite Four",
+    "OPPONENT_NORMAL": "Opponent"
+  },
+  "ITEMS": {
+    "Master Ball": "Master Ball",
+    "Ultra Ball": "Ultra Ball",
+    "X-Attack": "X-Attack",
+    "Choice Band": "Choice Band",
+    "Focus Band": "Focus Band",
+    "Max Revive": "Max Revive",
+    "Rare Candy": "Rare Candy",
+    "Escape Rope": "Escape Rope",
+    "Revive": "Revive"
+  },
+  "ITEM_DESCRIPTIONS": {
+    "instant-win": "Win the battle automatically (Master Ball Effect).",
+    "capture": "Capture the current opponent immediately and force you to swap it with one of your team.",
+    "stat-boost-50": "+50% to the current battle stat.",
+    "stat-boost-100": "+100% to the current battle stat.",
+    "shield": "Protects from defeat: If you lose, the Pokémon does not faint.",
+    "reroll-stat": "Reroll the stat selected for the battle.",
+    "revive-all": "Revive ALL fainted Pokémon on your team.",
+    "tier-boost": "Your team evolves to Tier 3 temporarily for this battle.",
+    "opponent-reroll": "Change the current opponent for another random one (Doesn't work in League).",
+    "opponent-nerf": "Reduces the opponent's stat by 30%.",
+    "revive-one": "Revive a Pokémon of your choice from your team."
+  }
+}
